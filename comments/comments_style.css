@@ -1,0 +1,75 @@
+#comment-list{
+	display: block;
+}
+#Login{
+	font-size: 15px;
+}
+.comment{
+	margin-top: 40px;
+	display: flex;
+	word-wrap:break-word;
+}
+.comment a, .comment img{
+	width:50px;
+	height:50px;
+	min-width: 50px;
+    min-height: 50px;
+}
+.comment span{
+	text-align: left;
+	padding-left: 10px;	
+	float: right;
+}
+.comment span p{
+	font-size: 12px;
+	margin:auto;
+}
+.comment span h4{
+	margin: auto;
+}
+.comment span h4 a{
+	text-decoration: none;
+}
+.comment span h4 a:hover {
+	color: blue;
+	text-decoration: underline;
+}
+
+#send_button{
+	cursor: pointer;
+	padding: 10px;
+	background-color: #71bc22;
+	color: #fff;
+	text-decoration: none;
+	border-radius: 2px;
+	white-space: nowrap;
+	-webkit-transition: all 0.2s ease-in-out 0s;
+  	-moz-transition: all 0.2s ease-in-out 0s;
+  	-o-transition: all 0.2s ease-in-out 0s;
+  	transition: all 0.2s ease-in-out 0s;
+}
+
+.send_button_loading{
+	background-color: #9A9A9A !important;
+	background-image: url("/comments/24.GIF");
+	background-position: 50% 50%;
+	background-size: 30%;
+	background-repeat: no-repeat;
+}
+
+#send_button:hover{
+	background-color: #89E12C;
+}
+
+.send_button_blocked{
+	background-color: #9A9A9A !important;
+}
+
+.send_button_loading span{
+	visibility: hidden;
+}
+
+.send_button_loading:hover{
+	background-color: #9A9A9A !important;
+}
+

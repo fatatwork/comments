@@ -1,0 +1,57 @@
+#################
+## openFrameworks
+#################
+[Bb]in/*
+![Bb]in/data/
+[Bb]uild/
+[Oo]bj/
+[Oo]bj/Debug/
+[Dd]ebug*/
+[Rr]elease*/
+*.mode*
+*.app/
+*.pyc
+*.log
+#################
+## Code::Blocks
+#################
+*.depend
+*.layout
+*.o
+obj/
+bin/
+#################
+##PhpStorm
+#################
+.idea/
+##############
+##?????
+##############
+design/
+*.jpg
+*.jpeg
+*.gif
+*.png
+.fuse*
+############
+## Sublime Text
+############
+*.json
+*.sublime-project
+*.sublime-workspace
+############
+## Windows VS
+############
+Web.config
+*.publishproj
+App_data/
+*.sln
+*.suo
+# Windows image file caches
+Thumbs.db
+# Folder config file
+Desktop.ini
+.directory
+*.sdf
+*.publishproj
+###Another files
