@@ -71,7 +71,7 @@ if(isset($_SESSION['code']) && isset($_POST['getData'])){
 		
 		$life_time     = time() + ( 60 * 60 * 24 * 7 );
 		$access_path   = "/";
-		$access_domain = "bsmu.akson.by";
+		$access_domain = "comments.akson.by";
 		setcookie( 'first_name', $_SESSION['first_name'], $life_time, $access_path,
 			$access_domain );
 		setcookie( 'last_name', $_SESSION['last_name'], $life_time, $access_path,
@@ -85,7 +85,7 @@ if(isset($_SESSION['code']) && isset($_POST['getData'])){
 		setcookie( 'page_adress', $_SESSION['page_adress'], $life_time, $access_path,
 			$access_domain );
 		echo "<p>Вы вошли как: <a href='" . $_SESSION['page_adress'] . "'>" . $userInfo['first_name'] . " " . $userInfo['last_name'] ."</a></p>"; 
-		echo "<p><a href='http://bsmu.akson.by/comments/logout.php?logout=1'>Выйти</a></p>";
+		echo "<p><a href='http://comments.akson.by/comments/logout.php?logout=1'>Выйти</a></p>";
 		};
 		//header("Location: http://".$_SESSION['page_adress']);
 	unset($_SESSION['code']); //Убираем код из сессии

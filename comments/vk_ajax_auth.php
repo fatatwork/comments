@@ -70,7 +70,7 @@
       
           $life_time     = time() + ( 60 * 60 * 24 * 7 );
           $access_path   = "/";
-          $access_domain = "bsmu.akson.by";
+          $access_domain = "comments.akson.by";
           setcookie('first_name', $_SESSION['first_name'], $life_time, $access_path, $access_domain );
           setcookie('last_name', $_SESSION['last_name'], $life_time, $access_path, $access_domain );
           setcookie('image', $_SESSION['image'], $life_time, $access_path, $access_domain);
