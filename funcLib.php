@@ -2,7 +2,7 @@
 require_once 'connectDB.php';
 require_once 'VKclass.php';
 
-function searchActicle( $page_adress ) {
+function searchArticle( $page_adress ) {
 	$query = "SELECT id FROM news WHERE link = '{$page_adress}';";
 	$result = mysql_query( $query )
 	or die( "<p>Невозможно получить адрес страницы: " . mysql_error()
@@ -89,7 +89,7 @@ function addComment( $article_id, $user_id, $comment ) {//добавляем к�
 
 function getComments( $page_adress ) {
 	 //INET_ATON-преобразует ip В число и INET_NTOA-число в ip
-	$newsID     = searchActicle( $page_adress );
+	$newsID     = searchArticle( $page_adress );
 	$actualTime = time();
 	//Создаем запрос на слияние данных о пользователях с данными об их комментариях
 	$query
@@ -100,8 +100,7 @@ function getComments( $page_adress ) {
 	        . "</p>" );
 	$commentArray = array();
 	while ( $row = mysql_fetch_array( $result_obj ) ) { //Сюда должна лечь новая строка ассоциативного массива
-		//$row['add_time'] = date( "d.m.y - H:i", $row['add_time'] ); //преобразуем время к формату
-		array_push( $commentArray, $row );
+		if($row!=null || $row!=false) array_push( $commentArray, $row );
 	}
 
 	return $commentArray;

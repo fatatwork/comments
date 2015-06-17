@@ -3,15 +3,17 @@ session_start();
 header('Content-type: text/html; charset=utf-8');
 require_once '../funcLib.php';
 
-//адрес странички с которой перенаправляемься на авторизацию
-$_SESSION['page_adress']  = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+//адрес странички с которой перенаправляемься на авторизацию Http дописывается
+//тк window.location захватывает адрес целиком
+$_SESSION['page_url']  = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
 if ( isset( $_COOKIE['first_name'] ) ) {
-	echo "куки";
+	//echo "куки";
 	$userName = $_COOKIE['first_name'] . " " . $_COOKIE['last_name'];
 	$userLink = "http://vk.com/id".$_COOKIE['identity'];
 }else {
 	if(isset($_SESSION['first_name'])){
-		echo "сессия";
+		//echo "сессия";
 		$userName=$_SESSION['first_name']." ".$_SESSION['last_name'];
 		$userLink=$_SESSION['identity'];
 	}
@@ -31,11 +33,14 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 
 	<meta http-equiv="Content-Type" content="text/html; CHARSET=windows-1251">
 	<link href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700&subset=cyrillic-ext" rel="stylesheet" type="text/css">
-	<link href="/comments/comments_style.css" rel="stylesheet" type="text/css">
+
+	
 
 	<script type="text/javascript"
 	        src="http://www.bsmu.by/scripts/jquery.min.js"></script>
 	<script type="text/javascript" src="http://www.bsmu.by/scripts/upper.js"></script>
+	<link href="/comments/comments_style.css" rel="stylesheet" type="text/css">
+
 	<link rel="stylesheet" type="text/css"
 	      href="http://www.bsmu.by/style_main_ru.css">
 	<link rel="stylesheet" type="text/css"
@@ -249,6 +254,8 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 
 	<p><em>Методист ОВРМ Янь Ольга Юрьевна</em></p></p>
 	<br/>
+	<h3>&nbsp;Поделитесь</h3>
+	<div data-yasharel10n="ru" data-yasharetype="none" data-yasharequickservices="facebook,twitter,vkontakte,odnoklassniki,moimir,lj,gplus,yaru,friendfeed,moikrug" class="yashare-auto-init"></div>
 	<!-- Форма отправляющая данные -->
 	<div id="user_info">
 	<?php
@@ -267,7 +274,6 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 	<form class="comments" action="#">
 	<div class="comment-send-area">
 		<textarea name="user_comment" cols="50" rows="10"></textarea>
-		<!--onClick="saveform (this.form);return false;"-->
 	</div>
 	</form>		
 	<a id="send_button"><span>Оставить сообщение</span></a>
@@ -275,7 +281,6 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 	<div id="comment-list"></div>
 	<script charset="utf-8" src="http://yandex.st/share/share.js"
 	        type="text/javascript"></script>
-	<!--<div data-yasharel10n="ru" data-yasharetype="none" data-yasharequickservices="facebook,twitter,vkontakte,odnoklassniki,moimir,lj,gplus,yaru,friendfeed,moikrug" class="yashare-auto-init"></div>-->
 </div>
 <div class="AnonsOther">
 	<p>
@@ -484,8 +489,13 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 					width="60" height="56"/></a></p>
 	</div>
 </div>
+	
+
+<!--наши скрипт-->
 <script type="text/javascript" src="/comments/ajax_funcLib.js"></script>
-	<script type="text/javascript" src="/comments/ajax_control.js"></script>
+<script type="text/javascript" src="/comments/ajax_control.js"></script>
+
+
 <script src="http://www.bsmu.by/scripts/menu.js"
         type="text/javascript"></script>
 <script src="http://www.bsmu.by/scripts/lang_box.js"

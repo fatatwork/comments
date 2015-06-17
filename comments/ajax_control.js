@@ -31,7 +31,8 @@ $("#send_button").click(
 			$(btn).addClass("send_button_loading");
 			/*Извлекаем текст комментария из текстового поля*/
 			var textOfComment = $('textarea[name=user_comment]')[0].value;
-			var params = "currentComment=" + textOfComment; /*Параметры: пара = значение*/
+			 /*Параметры: пара = значение*/
+			var params = 'currentComment='+textOfComment+'&pageUrl='+window.location;
 			insertNewData(params, "../add-comment.php", "comment-list", "POST");
 			var intervalHandle = setInterval(function() { /*Таймаут на соединение*/
 				if (sucessful == true) {
