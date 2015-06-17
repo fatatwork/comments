@@ -55,7 +55,7 @@ if(is_array($commentOut) && sizeof($commentOut)>0){
 	}
 }else{
 	echo "<div class='comment'>
-			<span><h4> Пока нет комментариев...</h4></span>
+			<span><p> Пока нет комментариев...</p></span>
 		  </div>";
 }
 ?>

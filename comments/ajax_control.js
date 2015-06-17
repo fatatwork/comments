@@ -62,6 +62,12 @@ $("#send_button").click(
 			}
 		}
 	});
+//очистка поля ввода комментария после отправки
+$(document).ready(function(){
+            $('#send_button').bind('click',function(){
+                setTimeout("$('textarea').val('')",100);
+            });
+        });
 
 var hSendBtnBlockInterval = setInterval(function() {
 	//Функция контролирует состояние и внешний вид кнопки отправки в зависимости от состояния формы

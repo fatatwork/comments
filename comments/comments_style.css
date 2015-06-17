@@ -2,7 +2,7 @@
 	display: block;
 }
 #Login{
-	font-size: 15px;
+	font-size: 18px;
 }
 .comment{
 	margin-top: 40px;
@@ -14,17 +14,20 @@
 	height:50px;
 	min-width: 50px;
     min-height: 50px;
+    font-size: 15px;
 }
 .comment span{
 	text-align: left;
-	padding-left: 10px;	
+	padding-left: 10px;
+	font-size: 15px;	
 	float: right;
 }
 .comment span p{
-	font-size: 12px;
+	font-size: 18px;
 	margin:auto;
 }
 .comment span h4{
+	font-size: 12px;
 	margin: auto;
 }
 .comment span h4 a{
