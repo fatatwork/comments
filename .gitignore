@@ -36,7 +36,6 @@ design/
 ############
 ## Sublime Text
 ############
-*.json
 *.sublime-project
 *.sublime-workspace
 ############
