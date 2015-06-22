@@ -6,7 +6,8 @@ var approve = true; //Разрешение на повторное нажати�
 var sentCheckInterval = 1000;
 var antiSpamTimeout = 10000;
 var messageOnce = false; //Показывает выводилось ли уже сообщение о частой отправке
-
+var authorized = false;
+var app_id = vk_script_add(); //Динамически добавляем скрипт API
 
 function getExistComments() {
 	var params = "getComments=true";
@@ -31,8 +32,8 @@ $("#send_button").click(
 			$(btn).addClass("send_button_loading");
 			/*Извлекаем текст комментария из текстового поля*/
 			var textOfComment = $('textarea[name=user_comment]')[0].value;
-			 /*Параметры: пара = значение*/
-			var params = 'currentComment='+textOfComment+'&pageUrl='+window.location;
+			/*Параметры: пара = значение*/
+			var params = 'currentComment=' + textOfComment + '&pageUrl=' + window.location;
 			insertNewData(params, "../add-comment.php", "comment-list", "POST");
 			var intervalHandle = setInterval(function() { /*Таймаут на соединение*/
 				if (sucessful == true) {
@@ -52,9 +53,8 @@ $("#send_button").click(
 			if (messageOnce != true) {
 				if (approve == false) {
 					$(btn).context.innerHTML = "<span>Подождите " + antiSpamTimeout / 1000 + " секунд.</span>";
-				}
-				else{
-					if(blockedSendBtn == true){
+				} else {
+					if (blockedSendBtn == true) {
 						$(btn).context.innerHTML = "<span>Сначала Вам необходимо войти.</span>";
 					}
 				}
@@ -62,12 +62,20 @@ $("#send_button").click(
 			}
 		}
 	});
+
+
 //очистка поля ввода комментария после отправки
-$(document).ready(function(){
-            $('#send_button').bind('click',function(){
-                setTimeout("$('textarea').val('')",100);
-            });
-        });
+$(document).ready(function() {
+	$('#send_button').bind('click', function() {
+		setTimeout("$('textarea').val('')", 100);
+	});
+	setTimeout(function() {
+		VK.init({
+			apiId: app_id
+		});
+		VK.Auth.getLoginStatus(contentChange);
+	}, 1000);
+});
 
 var hSendBtnBlockInterval = setInterval(function() {
 	//Функция контролирует состояние и внешний вид кнопки отправки в зависимости от состояния формы
@@ -75,15 +83,14 @@ var hSendBtnBlockInterval = setInterval(function() {
 	var logout_btn = document.getElementById("vk_logout");
 	var send_button = document.getElementById("send_button");
 
-	if (approve == true && messageOnce == false) { 
+	if (approve == true && messageOnce == false) {
 		send_button.innerHTML = defaultSendBtnText;
 	}
 
 	if (auth_btn != null && blockedSendBtn == false) {
 		blockedSendBtn = true;
 		send_button.className += ' send_button_blocked'
-	} 
-	else {
+	} else {
 		if (logout_btn != null && blockedSendBtn == true) {
 			send_button.innerHTML = defaultSendBtnText;
 			var els = Array.prototype.slice.call( //Удаляем класс скрытности
@@ -120,69 +127,87 @@ if(document.getElementById("vk_auth") != null){
 clearInterval(hAuthBtnInterval);
 document.getElementById("vk_auth").addEventListener("click",*/
 function vk_auth() {
-		function getCookie(name) {
-			var matches = document.cookie.match(new RegExp(
-				"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-			));
-			return matches ? decodeURIComponent(matches[1]) : undefined;
-		}
+	VK.init({
+		apiId: app_id
+	});
 
-		var app_id = vk_script_add(); //Динамически добавляем скрипт API
-
-		var hInterval = setInterval(function() {
-			if (app_id != undefined) {
-				clearInterval(hInterval);
-				VK.init({
-					apiId: app_id
-				});
-
-				function authInfo(response) {
-					if (response.session) { //Авторизованный пользователь
-						//Отправляем строку с сессионными данными пользователя для проверки авторизации
-						var params = "params=" + getCookie("vk_app_" + app_id);
-						insertNewData(params, "vk_ajax_auth.php", "user_info", "POST");
-					} else { //Не авторизованный
-					}
-				}
-				VK.Auth.login(function() { //Выводим попап
-					VK.Auth.getLoginStatus(authInfo);
-				});
-			}
-		}, sentCheckInterval);
+	function getCookie(name) {
+		var matches = document.cookie.match(new RegExp(
+			"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+		));
+		return matches ? decodeURIComponent(matches[1]) : undefined;
 	}
-	/*);
-	}
-	});*/
+	//Отправляем строку с сессионными данными пользователя для проверки авторизации
+	var params = "params=" + getCookie("vk_app_" + app_id);
+	insertNewData(params, "vk_ajax_auth.php", null, "POST");
 
-//$('#vk_logout').click(
-/*var hInterval = setInterval(function() { //Проверяем - появилась ли кнопка, для которой добавляем листенер
-	if (document.getElementsByClassName("vk_logout")[0] != null) {
-		clearInterval(hInterval);
-		document.getElementsByClassName("vk_logout")[0].addEventListener("click",*/
+	VK.Auth.login(function() { //Выводим попап
+		VK.Auth.getLoginStatus(contentChange);
+	});
+}
+
 //Слушаем кнопку, ждем нажатия
-function vk_logout() {
-		event.preventDefault();
-		var app_id = vk_script_add();
-		var hInterval = setInterval(function() {
-			if (app_id != undefined) {
-				clearInterval(hInterval);
-				VK.init({
-					apiId: app_id
-				});
-				VK.Auth.getLoginStatus(
+function vk_Logout() {
+	event.preventDefault();
+	if (app_id != undefined) {
+		VK.init({
+			apiId: app_id
+		});
+		VK.Auth.getLoginStatus(
+			function() {
+				VK.Auth.logout(
 					function() {
-						VK.Auth.logout(
-							function() {
-								var params = "logout=1";
-								insertNewData(params, "logout.php", "user_info", "POST");
-								messageOnce = false;
-							}
-						);
+						var params = "logout=1";
+						insertNewData(params, "logout.php", null, "POST");
+						messageOnce = false;
+						VK.Auth.getLoginStatus(contentChange);
 					}
 				);
 			}
-		}, sentCheckInterval);
+		);
 	}
-	/*		);
+}
+
+function contentChange(response) {
+	if (app_id != undefined) {
+		VK.init({
+			apiId: app_id
+		});
+
+		var infoBlock = document.getElementById("user_info");
+
+		if (response.session) { //Авторизованный пользователь
+			var user_id = response.session.mid;
+			VK.Api.call('users.get', {
+					user_ids: user_id,
+					fields: 'photo_50',
+					name_case: 'nom'
+				},
+				function(ret) {
+					if (ret.response) {
+						//Формируем вывод данных о пользователе
+						var childLength = infoBlock.childNodes.length;
+						for (i = 0; i < childLength; ++i) {
+							infoBlock.removeChild(infoBlock.childNodes[0]);
+						}
+						var image = document.createElement("div");
+						var authText = document.createElement("div");
+						infoBlock.appendChild(image);
+						image.innerHTML = "<img src='" + ret.response[0].photo_50 + "'/><br/>";
+						infoBlock.appendChild(authText);
+						authText.innerHTML = "Вы вошли как: <a href='vk.com/id" + ret.response[0].uid + "'>" + ret.response[0].first_name + " " + ret.response[0].last_name + "</a></p><p><a id='vk_logout' onClick='vk_Logout()' href='#'>Выйти</a></p>";
+					}
+				})
+
+		} else { //Не авторизованный
+			var childLength = infoBlock.childNodes.length;
+			for (i = 0; i < childLength; ++i) {
+				infoBlock.removeChild(infoBlock.childNodes[0]);
+			}
+			var logoutText = document.createElement("div");
+			logoutText.id = "Login";
+			logoutText.innerHTML = "<p>Вы не авторизированы. Войдите через соц-сеть</p><br /><a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a>"
+			infoBlock.appendChild(logoutText);
 		}
-	}, sentCheckInterval);*/
+	}
+}

@@ -54,3 +54,4 @@ Desktop.ini
 *.sdf
 *.publishproj
 ###Another files
+*.json

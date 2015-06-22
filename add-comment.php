@@ -18,7 +18,6 @@ if ( isset( $_COOKIE['first_name'], $_COOKIE['last_name'] ) ) {
 			$username['identity']   = $_SESSION['identity'];
 		}
 }
-
 if(isset($_POST['pageUrl'])) $page_url=$_POST['pageUrl'];
 else $page_url = $_SESSION['page_url'];
 
@@ -40,7 +39,7 @@ if(isset($_POST['currentComment'])){
 }
 $commentOut = getComments($page_url); //Получаем комментарии
 
-
+//print_r($commentOut);
 if(is_array($commentOut) && sizeof($commentOut)>0){
 	$commentOut = array_reverse($commentOut, true);
 	foreach($commentOut as $comment){

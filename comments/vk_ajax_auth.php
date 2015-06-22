@@ -82,7 +82,7 @@
           //Возвращаем данные пользователя скрипту авторизации
           //print_r($member);
 
-          $outString = "<p>Вы вошли как: <a href='$userLink'>".$userName."</a></p>" . "<p><a id='vk_logout' onClick='vk_logout()' href='#'>Выйти</a></p>";
+          $outString = "<p>Вы вошли как: <a href='$userLink'>".$userName."</a></p>" . "<p><a id='vk_logout' onClick='vk_Logout()' href='#'>Выйти</a></p>";
           echo $outString;
       }
 

@@ -257,20 +257,7 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 	<h3>&nbsp;Поделитесь</h3>
 	<div data-yasharel10n="ru" data-yasharetype="none" data-yasharequickservices="facebook,twitter,vkontakte,odnoklassniki,moimir,lj,gplus,yaru,friendfeed,moikrug" class="yashare-auto-init"></div>
 	<!-- Форма отправляющая данные -->
-	<div id="user_info">
-	<?php
-	if(!isset($userName)&&!isset($userLink)){
-	echo "<div id='Login'>
-			<p>Вы не авторизированы. Войдите через соц-сеть</p><br />
-			<a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a>
-			</div>";
-		}
-		else{
-			$out = "<p>Вы вошли как: <a href='$userLink'>".$userName."</a></p>" . "<p><a id='vk_logout' href='#' onClick='vk_logout()'>Выйти</a></p>";
-			echo $out;
-		}
-	?>
-	</div>
+	<div id="user_info"></div>
 	<form class="comments" action="#">
 	<div class="comment-send-area">
 		<textarea name="user_comment" cols="50" rows="10"></textarea>
