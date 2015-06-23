@@ -2,61 +2,54 @@
 	errorDelay = 10000;
 	ajaxReturn = null;
 
-	function insertNewData(params, php_script_path, targetHTMLid, method){
-		sucessful = false;
+	function insertNewData(params, php_script_path, targetHTMLid, method, callback) {
 		request = new ajaxRequest(); /*Создаем новый обьект запроса (функция снизу)*/
 		request.open(method, php_script_path, true); /*Настраиваем обьект на создаение post запроса по адресу файла php сценария. true - указывает на включение асинхронного режима*/
-		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded"); 
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		/*Отправляем http заголовки, для того чтобы сервер знал о поступлении POST запроса*/
-		request.onreadystatechange = function(){ /*Указывает на CALLBACK функцию, которая должна вызываться при каждом изменении свойства readyState*/
-			if (this.readyState == 4) {
-				if(this.status == 200){
-					clearTimeout(timeoutHandle);
-					if(this.responseText != null || this.responseText == true){
-						if(targetHTMLid != null){ //Если есть необходимость делать вставку в документ
-							if(this.responseText !== ""){
-								document.getElementById(targetHTMLid).innerHTML = this.responseText;
-							}
-							else{
-								sucessful = false;
+		request.onreadystatechange = makeAjaxRequest(request, callback, targetHTMLid); //Передаем сюда колбек функцию
+		request.send(params); /*Собственно отправка запроса*/
+
+	}
+
+	function makeAjaxRequest(request, callback, targetHTMLid) { //Цель этой функции - распаковать атрибуты внутрь объекта onreadystatechange
+		//Эта функция возвращает свойству onreadystatechange анонимную функцию описанную ниже, уже с нашими параметрами
+		return function() {
+			if (request.readyState == 4) {
+				if (request.status == 200) {
+					if (request.responseText != null || request.responseText == true) {
+						if (targetHTMLid != null) { //Если есть необходимость делать вставку в документ
+							if (request.responseText !== "") {
+								document.getElementById(targetHTMLid).innerHTML = request.responseText;
+								callback(true);
+							} else {
+								callback(false);
 								alert("Ошибка AJAX: Нет данных.");
 							}
+						} else {
+							ajaxReturn = request.responseText;
 						}
-						else{
-							ajaxReturn = this.responseText;
-						}
-						sucessful = true;
-					}
-					else{
+					} else {
 						alert("Ошибка AJAX: Данные не получены");
 					}
+				} else {
+					alert("Ошибка AJAX: " + request.statusText);
 				}
-				else{
-					clearTimeout(timeoutHandle);
-					alert("Ошибка AJAX: " + this.statusText);
-				}
-			};
+			}
 		}
-		request.send(params); /*Собственно отправка запроса*/
-		var timeoutHandle = setTimeout( function(){ /*Таймаут на соединение*/
-	    	request.abort(); errorHandler("Время ожидания вышло. Проверьте соединение и попробуйте ещё раз.") 
-	    	}, errorDelay);
 	}
 
 
-	function ajaxRequest(){
-		try{
+	function ajaxRequest() {
+		try {
 			var request = new XMLHttpRequest()
-		}
-		catch(e1){
-			try{
+		} catch (e1) {
+			try {
 				request = new ActiveXObject("Msxml2.XMLHTTP");
-			}
-			catch(e2){
-				try{
+			} catch (e2) {
+				try {
 					request = new ActiveXObject("Microsoft.XMLHTTP");
-				}
-				catch(e3){
+				} catch (e3) {
 					request = false;
 				}
 			}
@@ -64,28 +57,31 @@
 		return request;
 	}
 
-	function errorHandler(errorText){
+	function errorHandler(errorText) {
 		alert("Ошибка AJAX: " + errorText);
 	}
 
-	function adminGetExistArticles(){
+	function adminGetExistArticles() {
 		insertNewData("", "admin_get_articles.php", "list", "POST");
 	}
 
-	function banPressed(comment_id, user_id, param){
+	function banPressed(comment_id, user_id, param) {
 		var form = $("#form_" + comment_id);
-		var radios = $("#form_" + comment_id + " input[name="+param+"]");
-		switch(param){
-			case 'ban': for(var i=0; i != radios.lenght; ++i){
-									if(radios[i].checked == true){
-										insertNewData(param+'='+radios[i].value+'&'+'user_id='+user_id,'admin_get_comments.php', 'list', 'POST');
-										break;
-									}
-								}
+		var radios = $("#form_" + comment_id + " input[name=" + param + "]");
+		switch (param) {
+			case 'ban':
+				for (var i = 0; i != radios.lenght; ++i) {
+					if (radios[i].checked == true) {
+						insertNewData(param + '=' + radios[i].value + '&' + 'user_id=' + user_id, 'admin_get_comments.php', 'list', 'POST');
+						break;
+					}
+				}
 				break;
-			case 'delete': insertNewData(param+'='+comment_id,'admin_get_comments.php', 'list', 'POST');
+			case 'delete':
+				insertNewData(param + '=' + comment_id, 'admin_get_comments.php', 'list', 'POST');
 				break;
-			case 'unban_user': insertNewData(param+'='+user_id,'admin_get_comments.php', 'list', 'POST');
+			case 'unban_user':
+				insertNewData(param + '=' + user_id, 'admin_get_comments.php', 'list', 'POST');
 				break;
-		}	 
- }
+		}
+	}
