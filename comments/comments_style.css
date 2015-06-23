@@ -1,44 +1,57 @@
-#comment-list{
+#comments_module{
+	max-width: 50%;
+}
+
+#comment-list {
 	display: block;
 }
-#Login{
+
+#Login {
 	font-size: 18px;
 }
-.comment{
+
+.comment {
 	margin-top: 40px;
 	display: flex;
-	word-wrap:break-word;
+	word-wrap: break-word;
 }
-.comment a, .comment img{
-	width:50px;
-	height:50px;
+
+.comment a,
+.comment img {
+	width: 50px;
+	height: 50px;
 	min-width: 50px;
-    min-height: 50px;
-    font-size: 15px;
+	min-height: 50px;
+	font-size: 15px;
 }
-.comment span{
+
+.comment span {
 	text-align: left;
 	padding-left: 10px;
-	font-size: 15px;	
+	font-size: 15px;
 	float: right;
 }
-.comment span p{
+
+.comment span p {
 	font-size: 18px;
-	margin:auto;
+	margin: auto;
 }
-.comment span h4{
+
+.comment span h4 {
 	font-size: 12px;
 	margin: auto;
 }
-.comment span h4 a{
+
+.comment span h4 a {
 	text-decoration: none;
 }
+
 .comment span h4 a:hover {
 	color: blue;
 	text-decoration: underline;
 }
 
-#send_button{
+#send_button {
 	cursor: pointer;
 	padding: 10px;
 	background-color: #71bc22;
@@ -47,12 +60,12 @@
 	border-radius: 2px;
 	white-space: nowrap;
 	-webkit-transition: all 0.2s ease-in-out 0s;
-  	-moz-transition: all 0.2s ease-in-out 0s;
-  	-o-transition: all 0.2s ease-in-out 0s;
-  	transition: all 0.2s ease-in-out 0s;
+	-moz-transition: all 0.2s ease-in-out 0s;
+	-o-transition: all 0.2s ease-in-out 0s;
+	transition: all 0.2s ease-in-out 0s;
 }
 
-.send_button_loading{
+.send_button_loading {
 	background-color: #9A9A9A !important;
 	background-image: url("/comments/24.GIF");
 	background-position: 50% 50%;
@@ -60,19 +73,57 @@
 	background-repeat: no-repeat;
 }
 
-#send_button:hover{
+#send_button:hover {
 	background-color: #89E12C;
 }
 
-.send_button_blocked{
+.send_button_blocked {
 	background-color: #9A9A9A !important;
 }
 
-.send_button_loading span{
+.send_button_loading span {
 	visibility: hidden;
 }
 
-.send_button_loading:hover{
+.send_button_loading:hover {
 	background-color: #9A9A9A !important;
 }
 
+.send_button_denied {
+	background-color: #D1201C !important;
+}
+.send_button_denied:hover {
+	background-color: #F35D59 !important;
+}
+#user_comment {
+	overflow: auto;
+	max-height: 350px;
+	border: 2px solid #cbd2d6;
+	border: 2px solid rgba(0, 39, 59, .2);
+	border-radius: 2px;
+	position: relative;
+	margin: 15px 0 20px 0px;
+	background: #fff;
+	max-width: 70%;
+	min-width: 250px;
+	padding: 5px;
+}
+
+#user_comment p{
+	  margin-top: 2px;
+}
+
+#avatar {
+	float: left;
+	margin-right: 15px;
+}
+
+.loadAnim{
+	height: 17px;
+	width: 76px;
+}
+
+#commentsPlaceHolder{
+	  color: #cbd2d6;
+  font-size: 15px;
+}
