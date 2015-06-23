@@ -3,7 +3,8 @@ var sendBtnLocked;
 var antiSpamTimeout = 10000;
 var authorized;
 
-var app_id = vk_script_add(); //Динамически добавляем скрипт API
+var app_id = vk_api_add(); //Динамически добавляем скрипт API
+fb_api_add();
 
 //Module/////////
 
@@ -28,11 +29,11 @@ $(document).ready(function() {
 			apiId: app_id
 		});
 		loadingInsert();
-		VK.Auth.getLoginStatus(contentChange);
+		VK.Auth.getLoginStatus(contentChangeVK);
 	}, 1000);
 });
 
-function vk_script_add() {
+function vk_api_add() {
 	app_id = 4832378;
 	var script_added = false;
 	setTimeout(function() {
@@ -46,6 +47,28 @@ function vk_script_add() {
 	return app_id;
 }
 
+function fb_api_add() {
+	window.fbAsyncInit = function() {
+		FB.init({
+			appId: '403917006466762',
+			xfbml: true,
+			version: 'v2.3'
+		});
+
+	};
+
+	(function(d, s, id) {
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id)) {
+			return;
+		}
+		js = d.createElement(s);
+		js.id = id;
+		js.src = "//connect.facebook.net/ru_RU/sdk.js";
+		fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+}
+
 //Controls/////////
 $("#send_button").click(
 	function() {
@@ -53,15 +76,17 @@ $("#send_button").click(
 		if (authorized == true) {
 			if (sendBtnLocked != true) {
 				var minCommentLength = 7;
-				
+
 				/*Извлекаем текст комментария из текстового поля*/
 				var textArea = document.getElementById("user_comment");
-				var placeholder =  document.getElementById("commentsPlaceHolder");
+				var placeholder = document.getElementById("commentsPlaceHolder");
 				var textOfComment = textArea.innerText;
-				var holderText = placeholder.innerText;
-				//Поиск текста из плейсхолдера - не считается комментарием
-				if(textOfComment.indexOf(holderText) != -1){
-					textOfComment = undefined;
+				if (placeholder != undefined) {
+					var holderText = placeholder.innerText;
+					//Поиск текста из плейсхолдера - не считается комментарием
+					if (textOfComment.indexOf(holderText) != -1) {
+						textOfComment = undefined;
+					}
 				}
 				if (textOfComment != undefined) {
 					if (textOfComment.length >= minCommentLength) {
@@ -109,13 +134,14 @@ function vk_auth() {
 			if (response.session) {
 				var params = "params=" + getCookie("vk_app_" + app_id);
 				insertNewData(params, "vk_ajax_auth.php", null, "POST");
-				contentChange(response);
+				contentChangeVK(response);
 			}
 		});
 	});
 }
 
 //Слушаем кнопку, ждем нажатия
+//ПЕРЕПИСАТЬ - должна быть вилка на разные логауты сетей
 function vk_Logout() {
 	event.preventDefault();
 	if (app_id != undefined) {
@@ -129,7 +155,7 @@ function vk_Logout() {
 					function() {
 						var params = "logout=1";
 						insertNewData(params, "logout.php", null, "POST");
-						VK.Auth.getLoginStatus(contentChange);
+						VK.Auth.getLoginStatus(contentChangeVK);
 					}
 				);
 			}
@@ -138,51 +164,37 @@ function vk_Logout() {
 }
 
 //View/////////
-function contentChange(response) {
-	if (app_id != undefined) {
-		VK.init({
-			apiId: app_id
-		});
+function contentChangeVK(response) {
 
-		var infoBlock = document.getElementById("user_info");
+	if (response.session) { //Авторизованный пользователь
+		var user_id = response.session.mid;
+		VK.Api.call('users.get', {
+				user_ids: user_id,
+				fields: 'photo_50',
+				name_case: 'nom'
+			},
+			function(ret) {
+				if (ret.response) {
+					var userLink = "http://vk.com/id" + ret.response[0].uid;
+					var firstName = ret.response[0].first_name;
+					var lastName = ret.response[0].last_name;
+					var photo = ret.response[0].photo_50;
+					//Вызываем отрисовку данных о пользователе
+					contentAuthView(userLink, firstName, lastName, photo);
+				}
+			})
 
-		if (response.session) { //Авторизованный пользователь
-			var user_id = response.session.mid;
-			VK.Api.call('users.get', {
-					user_ids: user_id,
-					fields: 'photo_50',
-					name_case: 'nom'
-				},
-				function(ret) {
-					if (ret.response) {
-						//Формируем вывод данных о пользователе
-						var childLength = infoBlock.childNodes.length;
-						for (i = 0; i < childLength; ++i) {
-							infoBlock.removeChild(infoBlock.childNodes[0]);
-						}
+	} else { //Не авторизованный
+		contentNotAuthView();
+	}
+}
 
-						var authText = document.createElement("div");
-						var userLink = "http://vk.com/id" + ret.response[0].uid;
-						infoBlock.appendChild(authText);
-						authText.innerHTML = "<a href='" + userLink + "'>" + "<img id='avatar' src='" + ret.response[0].photo_50 + "'/></a><p>Вы вошли как: <a href='" +
-							userLink + "'>" + ret.response[0].first_name +
-							" " + ret.response[0].last_name +
-							"</a></p><p><a id='vk_logout' onClick='vk_Logout()' href='#'>Выйти</a></p>";
-						authorized = true;
-					}
-				})
+///function contentChangeVK(response) {
 
-		} else { //Не авторизованный
-			var childLength = infoBlock.childNodes.length;
-			for (i = 0; i < childLength; ++i) {
-				infoBlock.removeChild(infoBlock.childNodes[0]);
-			}
-			var logoutText = document.createElement("div");
-			logoutText.id = "Login";
-			logoutText.innerHTML = "<p>Вы не авторизированы. Войдите через соц-сеть</p><a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a>"
-			infoBlock.appendChild(logoutText);
-			authorized = false;
-		}
+function deleteAllChilds(parent) {
+	var childLength = parent.childNodes.length;
+	for (i = 0; i < childLength; ++i) {
+		parent.removeChild(parent.childNodes[0]);
 	}
 }
 
@@ -194,6 +206,29 @@ function textReplace(object, newText) {
 		$(object).removeClass("send_button_denied");
 		object.innerHTML = defaultObjectText;
 	}, errorTimeout);
+}
+
+function contentAuthView(userLink, first_name, last_name, photo) {
+	var infoBlock = document.getElementById("user_info");
+	//Формируем вывод данных о пользователе
+	deleteAllChilds(infoBlock);
+	var authText = document.createElement("div");
+	infoBlock.appendChild(authText);
+	authText.innerHTML = "<a href='" + userLink + "'>" + "<img id='avatar' src='" + photo + "'/></a><p>Вы вошли как: <a href='" +
+		userLink + "'>" + first_name +
+		" " + last_name +
+		"</a></p><p><a id='vk_logout' onClick='vk_Logout()' href='#'>Выйти</a></p>";
+	authorized = true;
+}
+
+function contentNotAuthView() {
+	var infoBlock = document.getElementById("user_info");
+	deleteAllChilds(infoBlock);
+	var logoutText = document.createElement("div");
+	logoutText.id = "Login";
+	logoutText.innerHTML = "<p>Вы не авторизированы. Войдите через соц-сеть</p><a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a>"
+	infoBlock.appendChild(logoutText);
+	authorized = false;
 }
 
 function btnLock(btn) {
