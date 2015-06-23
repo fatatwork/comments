@@ -20,7 +20,6 @@ if ( isset( $_COOKIE['first_name'], $_COOKIE['last_name'] ) ) {
 }
 if(isset($_POST['pageUrl'])) $page_url=$_POST['pageUrl'];
 else $page_url = $_SESSION['page_url'];
-
 if(isset($_POST['currentComment'])){
 	$comment = trim( $_POST['currentComment'] );
 	$user_ip=$_SERVER["REMOTE_ADDR"];
