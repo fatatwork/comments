@@ -80,8 +80,7 @@
           $userLink = "//vk.com/id" . $userInfo['uid'];
           $userName = $userInfo['first_name'] . " " . $userInfo['last_name'];
           //Возвращаем данные пользователя скрипту авторизации
-          //print_r($member);
-
+          //print_r($member);          
           $outString = "<p>Вы вошли как: <a href='$userLink'>".$userName."</a></p>" . "<p><a id='vk_logout' onClick='vk_Logout()' href='#'>Выйти</a></p>";
           echo $outString;
       }

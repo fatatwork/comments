@@ -19,7 +19,7 @@ $params = array(
 );
 
 //Запрос кода -> запись кода -> использование кода 
-
+echo "string";
 //формирование ссылки для авторизации
 if((!isset($_COOKIE['first_name'])&&!isset($_SESSION['first_name'])) && $_SESSION['codeRequested'] != true){
 	$_SESSION['codeRequested'] = true;
@@ -60,8 +60,6 @@ if(isset($_SESSION['code']) && isset($_POST['getData'])){
 			$set_cookie_result = true;
 		}
 	}
-
-
 	if ( isset( $userInfo )) {//Устанавливаем сессию и куки
 		$_SESSION['first_name']   = $userInfo['first_name'];
 		$_SESSION['last_name']    = $userInfo['last_name'];
