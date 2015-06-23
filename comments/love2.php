@@ -256,16 +256,20 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 	<br/>
 	<h3>&nbsp;Поделитесь</h3>
 	<div data-yasharel10n="ru" data-yasharetype="none" data-yasharequickservices="facebook,twitter,vkontakte,odnoklassniki,moimir,lj,gplus,yaru,friendfeed,moikrug" class="yashare-auto-init"></div>
-	<!-- Форма отправляющая данные -->
-	<div id="user_info"></div>
-	<form class="comments" action="#">
-	<div class="comment-send-area">
-		<textarea name="user_comment" cols="50" rows="10"></textarea>
+	<!-- Модуль комментариев -->
+	<div id="comments_module">
+		<div id="user_info"></div>
+			<form class="comments" action="#">
+				<div class="comment-send-area">
+					<div id="user_comment" onClick="delHolder()" role="textbox" contenteditable="true" data-role="editable" aria-multiline="true">
+					<p><span id="commentsPlaceHolder">Поделитесь своим мнением...</span></p></div>
+				</div>
+			</form>		
+		<a id="send_button"><span>Оставить сообщение</span></a>
+		
+		<div id="comment-list"></div>
 	</div>
-	</form>		
-	<a id="send_button"><span>Оставить сообщение</span></a>
-	
-	<div id="comment-list"></div>
+
 	<script charset="utf-8" src="http://yandex.st/share/share.js"
 	        type="text/javascript"></script>
 </div>
