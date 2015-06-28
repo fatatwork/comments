@@ -7,7 +7,7 @@ var fbAppId= 403917006466762;
 var vkAppId = 4832378;
 var app_id = vk_api_add(); //Динамически добавляем скрипт API
 fb_api_add();
-
+var photoFb;//глобальная переменная для фотки из фесбука
 //Module/////////
 
 function getExistComments() {
@@ -117,7 +117,7 @@ $("#send_button").click(
                         if(vkCookie!=undefined || ourVkCookie) addCommentsScript="../addVkComments.php";
                         if(fbCookie!=undefined || ourFbCookie) addCommentsScript="../addFbComments.php";
 
-						var params = 'currentComment=' + textOfComment + '&pageUrl=' + window.location;
+						var params = 'currentComment=' + textOfComment + '&pageUrl=' + window.location+'&image='+photoFb;
 						insertNewData(params, addCommentsScript, "comment-list", "POST", function(readyflag) {
 							if (readyflag) {
 								btnUnlock(btn);
@@ -167,7 +167,6 @@ function fb_auth() {
 }
 
 //Слушаем кнопку, ждем нажатия
-//ПЕРЕПИСАТЬ - должна быть вилка на разные логауты сетей
 function vk_Logout() {
 	event.preventDefault();
 	loadingInsert();
@@ -214,6 +213,7 @@ function contentChangeVK(response) {
 					var firstName = ret.response[0].first_name;
 					var lastName = ret.response[0].last_name;
 					var photo = ret.response[0].photo_50;
+					photoFb=photo;
 					//Вызываем отрисовку данных о пользователе
 					contentAuthView(userLink, firstName, lastName, photo, "vk");
 				}

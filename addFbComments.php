@@ -31,7 +31,7 @@ function loginFromFbSession() {
 			                     = $response->getGraphObject( Facebook\GraphUser::className() );
 			$_POST['first_name'] = $user->getFirstName();
 			$_POST['last_name']  = $user->getLastName();
-			$_POST['image']      = null;
+			//$_POST['image'] инициализируется в яваскрипте
 			$_POST['identity']   = $user->getId();
 			$_POST['network']    = 'facebook.com';
 			return true;

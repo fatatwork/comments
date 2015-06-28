@@ -88,7 +88,7 @@ function loginUser() {
 		if ( $userInfo ) {
 			$_POST['first_name'] = $userInfo['first_name'];
 			$_POST['last_name']  = $userInfo['last_name'];
-			$_POST['image']      = $userInfo['photo_50'];
+			$_POST['image']      = $userInfo['image'];
 			$_POST['network']    = "vk.com";
 			$_POST['identity']   = $userInfo['network_url'];
 			addCommentFromPage();//добавляем коммент
