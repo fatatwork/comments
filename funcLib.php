@@ -1,7 +1,6 @@
 <?php
 require_once 'connectDB.php';
-require_once 'VKclass.php';
-
+define('HASH_PREFIX', 'bsmu_');
 function searchArticle( $page_adress ) {
 	$query = "SELECT id FROM news WHERE link = '{$page_adress}';";
 	$result = mysql_query( $query )
@@ -44,14 +43,23 @@ function searchUserById( $user_id ) {
 	$row = mysql_fetch_array( $res );//получение результата запроса из базы;
 	return $row;
 }
-
+function getUserByHash($hash){
+	$query
+		= "SELECT * FROM users WHERE user_hash = '{$hash}'";//ищем есть ли такой же url в базе
+	$res = mysql_query( $query )
+	or die( "<p>Невозможно сделать запрос поиска пользователя: " . mysql_error()
+	        . "</p>" );
+	$row = mysql_fetch_array( $res );//получение результата запроса из базы;
+	return $row;
+}
 function addUser( $username, $user_ip ) {//добавление пользователя
-	if ( isset( $username['first_name'] ) ) {
+	if ( isset( $username['first_name'], $username['last_name'], $username['identity'] ) ) {
+		$hash_str = sha1(HASH_PREFIX.$username['identity']);
 		$query
 			=
-			"INSERT INTO users (first_name, last_name, image, network, network_url, user_ip) 
+			"INSERT INTO users (first_name, last_name, image, network, network_url,user_hash, user_ip)
 			VALUES ('{$username['first_name']}', '{$username['last_name']}','{$username['image']}', 
-				'{$username['network']}', '{$username['identity']}', INET_ATON('{$user_ip}'));";
+				'{$username['network']}', '{$username['identity']}', '{$hash_str}', INET_ATON('{$user_ip}' ));";
 		$result = mysql_query( $query )
 		or die( "<p>Невозможно добавить пользователя " . mysql_error()
 		        . "</p>" );
@@ -59,14 +67,8 @@ function addUser( $username, $user_ip ) {//добавление пользова
 }
 
 function updateUser( $username, $user_id, $user_ip ) {
-	//$user_id айди пользователя внутри нашей собственной базы
-	$app_id   = '4832378';
-	$vk       = new vk( $token, $delta, $app_id, $group_id );
-	$userinfo = $vk->getOneUser( $username['identity'] );
-	$userinfo = $userinfo[0];//т.к вернется массив из 1 пользователя
-	$query
-	          =
-		"UPDATE users SET first_name='{$userinfo->first_name}',last_name='{$userinfo->last_name}', image='{$userinfo->photo_50}', 
+	$query  =
+		"UPDATE users SET first_name='{$username['first_name']}',last_name='{$username['last_name']}', image='{$username['image']}', 
 		user_ip=INET_ATON('{$user_ip}') WHERE user_id='{$user_id}';";
 	$result   = mysql_query( $query );
 }
@@ -93,7 +95,7 @@ function getComments( $page_adress ) {
 	$actualTime = time();
 	//Создаем запрос на слияние данных о пользователях с данными об их комментариях
 	$query
-		= "SELECT id, user_id, comment, add_time, first_name, last_name, image, network_url, ban_time, user_ip 
+		= "SELECT id, user_id, comment, add_time, first_name, last_name, image, network_url, network,ban_time, user_ip 
 		FROM users NATURAL JOIN comments WHERE news_id='{$newsID}' AND deleted=false ORDER BY id;";
 	$result_obj = mysql_query( $query )
 	or die( "<p>Невозможно получить данные о комментариях: " . mysql_error()
@@ -172,5 +174,75 @@ function deleteComment($comment_id){
 	$res            = mysql_query( $query )
 	or die( "<p>Невозможно удалить комментарий: " . mysql_error()
 	        . "</p>" );
+}
+function addCommentFromPage(){
+	if ( isset( $_POST['first_name'], $_POST['last_name'] ) ) {
+	$username['first_name'] = $_POST['first_name'];
+	$username['last_name']  = $_POST['last_name'];
+	$username['image']		= $_POST['image'];
+	$username['network']    = $_POST['network'];
+	$username['identity']   = $_POST['identity'];
+	}
+if(isset($_POST['pageUrl'])) $page_url=$_POST['pageUrl'];
+else $page_url = $_SESSION['page_url'];
+
+	if(isset($_POST['currentComment'])){
+		$comment = trim( $_POST['currentComment'] );
+		$user_ip=$_SERVER["REMOTE_ADDR"];
+		if ( isset( $username ) ) {
+			$article_id = searchArticle( $page_url ); //Получаем идентификатор страницы на которой нужно разместить комментарий
+			$user_id = searchUser( $username );//первоначально ищем пользователя
+			if($user_id){//Пишем коммент
+			 updateUser($username, $user_id, $user_ip);
+			}
+			else {//если юзера нет- добавляем и пишем коммент
+				addUser($username, $user_ip);
+				$user_id = searchUser($username);
+			}
+			if($comment != "") addComment($article_id, $user_id, $comment);
+		}
+	}
+}
+function getCommentsFromPage(){
+	if(isset($_POST['pageUrl']))$commentOut = getComments($_POST['pageUrl']); //Получаем комментарии
+	else $commentOut=getComments($_SESSION['page_url']);
+	$html_text=array();
+	if(is_array($commentOut) && sizeof($commentOut)>0){
+		$commentOut = array_reverse($commentOut, true);
+		foreach($commentOut as $comment){
+			switch ($comment['network']) {
+				case 'vk.com':
+					$networkPrefix='http://vk.com/id';
+					break;
+				case 'facebook.com':
+					$networkPrefix='http://www.facebook.com/';
+					break;
+			}
+			$text="<div class='comment'>".
+			/*вывод аватарки
+			"<a href=\"http://vk.com/id".$comment['network_url']."\">".
+			"<img src=\"".$comment['image']."\"/></a>".*/
+			"<span> <h4>"."<a href=".$networkPrefix.$comment['network_url'].">".
+			$comment['first_name'] . " " . $comment['last_name'] . "</a> " 
+			. $comment['add_time'] . "</h4>" . $comment['comment']."</span>".
+			"</div>";
+			array_push($html_text, $text);
+		}
+	}else{
+		$text= "<div class='comment'>
+				<span><p> Пока нет комментариев...</p></span>
+			  </div>";
+		array_push($html_text, $text);
+	}
+	return $html_text;
+}
+function getHashForUser($network_url){
+
+	$query = "SELECT user_hash FROM users WHERE network_url = '{$network_url}'";//ищем есть ли такой же url в базе
+	$res = mysql_query( $query )
+		or die( "<p>Невозможно сделать запрос поиска пользователя: " . mysql_error()
+		        . "</p>" );
+	$row = mysql_fetch_array( $res );//получение результата запроса из базы;
+	return $row[0];
 }
 ?>

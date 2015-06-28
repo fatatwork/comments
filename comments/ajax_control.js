@@ -2,18 +2,28 @@ var errorTimeout = 4000;
 var sendBtnLocked;
 var antiSpamTimeout = 10000;
 var authorized;
-
+//айдишники проложений для социалок, эти айдишники будут фигурировать в названии кук
+var fbAppId= 403917006466762;
+var vkAppId = 4832378;
 var app_id = vk_api_add(); //Динамически добавляем скрипт API
 fb_api_add();
 
 //Module/////////
 
 function getExistComments() {
-	var params = "getComments=true";
-	insertNewData(params, "../add-comment.php", "comment-list", "POST");
+	var params='pageUrl='+window.location;
+	insertNewData(params, "../outComments.php", "comment-list", "POST");
+}
+getExistComments(); //Получаем уже существующие комментарии
+
+function getCookie(name) {
+	var matches = document.cookie.match(new RegExp(
+		"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+	));
+	return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
-getExistComments(); //Получаем уже существующие комментарии
+
 //Обрабатываем клик по кнопке
 var firstValue;
 
@@ -22,19 +32,29 @@ var firstValue;
 $(document).ready(function() {
 	//Нужно переписать - изменился HTML
 	$('#send_button').bind('click', function() {
-		setTimeout("$('textarea').val('')", 100);
+		setTimeout("$('user_comment').val('')", 100);
 	});
 	setTimeout(function() {
 		VK.init({
 			apiId: app_id
 		});
+		FB.init({
+			appId: fbAppId,
+			xfbml: false,
+			cookie: true,
+			version: 'v2.3'
+		});
 		loadingInsert();
 		VK.Auth.getLoginStatus(contentChangeVK);
+		FB.getLoginStatus(function(response) {
+			contentChangeFB(response);
+		});
+
 	}, 1000);
 });
 
 function vk_api_add() {
-	app_id = 4832378;
+	app_id = vkAppId;
 	var script_added = false;
 	setTimeout(function() {
 		var el = document.createElement("script");
@@ -48,14 +68,6 @@ function vk_api_add() {
 }
 
 function fb_api_add() {
-	window.fbAsyncInit = function() {
-		FB.init({
-			appId: '403917006466762',
-			xfbml: true,
-			version: 'v2.3'
-		});
-
-	};
 
 	(function(d, s, id) {
 		var js, fjs = d.getElementsByTagName(s)[0];
@@ -70,12 +82,13 @@ function fb_api_add() {
 }
 
 //Controls/////////
+//надо сделать переменную для проверки того в какой социальной сети я залогинен
 $("#send_button").click(
 	function() {
 		var btn = this;
 		if (authorized == true) {
 			if (sendBtnLocked != true) {
-				var minCommentLength = 7;
+				var minCommentLength = 4;
 
 				/*Извлекаем текст комментария из текстового поля*/
 				var textArea = document.getElementById("user_comment");
@@ -92,16 +105,27 @@ $("#send_button").click(
 					if (textOfComment.length >= minCommentLength) {
 
 						////////////////////
-						/*Параметры: пара = значение, отправляем комментарий*/
+						/*Параметры: пара = значение, отправляем комментарий, так же в яваскриппте проперяем какие куки уже есть на комп
+						и в зависмости от того для какой соцсетки - выбираем скрипт для отправки комментария*/
 						btnLock(btn);
+						var addCommentsScript=undefined;
+                        var vkCookie=getCookie("vk_app_"+vkAppId);
+                        var fbCookie=getCookie("fbsr_"+fbAppId);
+                        var ourVkCookie=getCookie("up_key_vk");
+                        var ourFbCookie=getCookie("up_key_fb");
+
+                        if(vkCookie!=undefined || ourVkCookie) addCommentsScript="../addVkComments.php";
+                        if(fbCookie!=undefined || ourFbCookie) addCommentsScript="../addFbComments.php";
+
 						var params = 'currentComment=' + textOfComment + '&pageUrl=' + window.location;
-						insertNewData(params, "../add-comment.php", "comment-list", "POST", function(readyflag) {
+						insertNewData(params, addCommentsScript, "comment-list", "POST", function(readyflag) {
 							if (readyflag) {
 								btnUnlock(btn);
 							} else {
 								textReplace(btn, "<span>Ошибка отправки</span>")
 							}
 						});
+						
 					} else {
 						textReplace(btn, "<span>Слишком короткое сообщение.</span>");
 					}
@@ -117,26 +141,28 @@ $("#send_button").click(
 	});
 
 function vk_auth() {
-	VK.init({
-		apiId: app_id
-	});
-
-	function getCookie(name) {
-		var matches = document.cookie.match(new RegExp(
-			"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-		));
-		return matches ? decodeURIComponent(matches[1]) : undefined;
-	}
 	//Отправляем строку с сессионными данными пользователя для проверки авторизации на стороне сервера
 	loadingInsert();
 	VK.Auth.login(function() { //Выводим попап
 		VK.Auth.getLoginStatus(function(response) {
 			if (response.session) {
-				var params = "params=" + getCookie("vk_app_" + app_id);
-				insertNewData(params, "vk_ajax_auth.php", null, "POST");
 				contentChangeVK(response);
 			}
 		});
+	});
+}
+
+function fb_auth() {
+	//Отправляем строку с сессионными данными пользователя для проверки авторизации на стороне сервера
+	loadingInsert();
+	FB.login(function(response) { //Popup
+		FB.getLoginStatus(function(response) { //Проверяем статус логина
+			if (response.status === 'connected') { //Если авторизовался
+                contentChangeFB(response); //Меняем внешний вид
+			}
+		});
+	}, {
+		scope: 'user_about_me'
 	});
 }
 
@@ -144,23 +170,32 @@ function vk_auth() {
 //ПЕРЕПИСАТЬ - должна быть вилка на разные логауты сетей
 function vk_Logout() {
 	event.preventDefault();
-	if (app_id != undefined) {
-		VK.init({
-			apiId: app_id
-		});
-		loadingInsert();
-		VK.Auth.getLoginStatus(
-			function() {
-				VK.Auth.logout(
-					function() {
-						var params = "logout=1";
-						insertNewData(params, "logout.php", null, "POST");
-						VK.Auth.getLoginStatus(contentChangeVK);
-					}
-				);
+	loadingInsert();
+	VK.Auth.getLoginStatus(
+		function() {
+			VK.Auth.logout(
+				function() {
+					var params = "logout=1";
+					insertNewData(params, "logout.php", null, "POST");
+					VK.Auth.getLoginStatus(contentChangeVK);
+				}
+			);
+		}
+	);
+}
+
+function fb_Logout() {
+	event.preventDefault();
+	loadingInsert();
+	FB.logout(function(response) {
+		FB.getLoginStatus(function(response) { //Проверяем статус логина
+			if (response.status !== 'connected') {
+				contentChangeFB()
+				var params = "logout=1";
+				insertNewData(params, "logout.php", null, "POST");
 			}
-		);
-	}
+		});
+	});
 }
 
 //View/////////
@@ -168,7 +203,7 @@ function contentChangeVK(response) {
 
 	if (response.session) { //Авторизованный пользователь
 		var user_id = response.session.mid;
-		VK.Api.call('users.get', {
+		VK.Api.call('users.get', { //Запрашиваем данные пользователя
 				user_ids: user_id,
 				fields: 'photo_50',
 				name_case: 'nom'
@@ -180,11 +215,39 @@ function contentChangeVK(response) {
 					var lastName = ret.response[0].last_name;
 					var photo = ret.response[0].photo_50;
 					//Вызываем отрисовку данных о пользователе
-					contentAuthView(userLink, firstName, lastName, photo);
+					contentAuthView(userLink, firstName, lastName, photo, "vk");
 				}
 			})
 
 	} else { //Не авторизованный
+		contentNotAuthView();
+	}
+}
+
+function contentChangeFB(response) {
+	if (response) {
+		if (response.status === 'connected') {
+			// Logged into your app and Facebook.
+			FB.api('/me', function(ret) { //Запрашиваем данные пользователя
+				var userLink = ret["link"];
+				var firstName = ret["first_name"];
+				var lastName = ret["last_name"];
+				//Отдельный запрос для получения фотографии
+				FB.api('/me/picture', photoGetWrapper(userLink, firstName, lastName));
+				function photoGetWrapper(userLink, firstName, lastName) {
+					//Замыкание
+					return function(ret) {
+						var photo = ret.data.url;
+						contentAuthView(userLink, firstName, lastName, photo, "fb");
+					}
+				}
+				///
+				
+			});
+		}
+	} else {
+		// The person is not logged into Facebook, so we're not sure if
+		// they are logged into this app or not.
 		contentNotAuthView();
 	}
 }
@@ -208,7 +271,7 @@ function textReplace(object, newText) {
 	}, errorTimeout);
 }
 
-function contentAuthView(userLink, first_name, last_name, photo) {
+function contentAuthView(userLink, first_name, last_name, photo, socNetID) {
 	var infoBlock = document.getElementById("user_info");
 	//Формируем вывод данных о пользователе
 	deleteAllChilds(infoBlock);
@@ -217,7 +280,7 @@ function contentAuthView(userLink, first_name, last_name, photo) {
 	authText.innerHTML = "<a href='" + userLink + "'>" + "<img id='avatar' src='" + photo + "'/></a><p>Вы вошли как: <a href='" +
 		userLink + "'>" + first_name +
 		" " + last_name +
-		"</a></p><p><a id='vk_logout' onClick='vk_Logout()' href='#'>Выйти</a></p>";
+		"</a></p><p><a id='vk_logout' onClick='" + socNetID + "_Logout()' href='#'>Выйти</a></p>";
 	authorized = true;
 }
 
@@ -226,7 +289,7 @@ function contentNotAuthView() {
 	deleteAllChilds(infoBlock);
 	var logoutText = document.createElement("div");
 	logoutText.id = "Login";
-	logoutText.innerHTML = "<p>Вы не авторизированы. Войдите через соц-сеть</p><a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a>"
+	logoutText.innerHTML = "<p>Вы не авторизированы. Войдите через соц-сеть</p><a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a><a id='fb_auth' onClick='fb_auth()'><img src='../design/fb_icon.png'></a>"
 	infoBlock.appendChild(logoutText);
 	authorized = false;
 }
@@ -261,4 +324,15 @@ function loadingInsert() {
 	loadAnim.className = "send_button_loading loadAnim";
 	var blockWithInfo = document.getElementById("user_info");
 	blockWithInfo.appendChild(loadAnim);
+}
+
+
+
+function testAPI() {
+	console.log('Welcome!  Fetching your information.... ');
+	FB.api('/me', function(response) {
+		console.log('Successful login for: ' + response.name);
+		document.getElementById('status').innerHTML =
+			'Thanks for logging in, ' + response.name + '!';
+	});
 }

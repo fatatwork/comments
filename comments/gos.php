@@ -5,18 +5,6 @@ require_once '../funcLib.php';
 
 //адрес странички с которой перенаправляемься на авторизацию
 $_SESSION['page_url'] = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-if ( isset( $_COOKIE['first_name'] ) ) {
-	//echo "куки";
-	$userName = $_COOKIE['first_name'] . " " . $_COOKIE['last_name'];
-	$userLink = "http://vk.com/id" . $_COOKIE['identity'];
-} else {
-	if ( isset( $_SESSION['first_name'] ) ) {
-		//echo "сессия";
-		$userName = $_SESSION['first_name'] . " " . $_SESSION['last_name'];
-		$userLink = $_SESSION['identity'];
-	}
-}
 ?>
 <!DOCTYPE html>
 <HTML xmlns="http://www.w3.org/1999/xhtml">
@@ -42,7 +30,7 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 	      href="http://www.bsmu.by/style_main_ru.css">
 	<link rel="stylesheet" TYPE="text/css"
 	      HREF="http://www.bsmu.by/style_ru.css">
-	<link href="/comments/comments_style.css" rel="stylesheet" type="text/css">
+	<link href="/design/comments_style.css" rel="stylesheet" type="text/css">
 
 
 	<link href="http://www.bsmu.by/rss/rss.xml" rel="alternate"
@@ -189,31 +177,19 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 			<div data-yasharel10n="ru" data-yasharetype="none"
 			     data-yasharequickservices="facebook,twitter,vkontakte,odnoklassniki,moimir,lj,gplus,yaru,friendfeed,moikrug"
 			     class="yashare-auto-init"></div>
-			<!-- Форма отправляющая данные -->
-			<div id="user_info">
-				<?php
-				if ( ! isset( $userName ) && ! isset( $userLink ) ) {
-					echo "<div id='Login'>
-			<p>Вы не авторизированы. Войдите через соц-сеть</p><br />
-			<a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a>
-			</div>";
-				} else {
-					$out = "<p>Вы вошли как: <a href='$userLink'>" . $userName
-					       . "</a></p>"
-					       . "<p><a id='vk_logout' href='#' onClick='vk_logout()'>Выйти</a></p>";
-					echo $out;
-				}
-				?>
+			<!-- Модуль комментариев -->
+			<div id="comments_module">
+				<div id="user_info"></div>
+					<form class="comments" action="#">
+						<div class="comment-send-area">
+							<div id="user_comment" onClick="delHolder()" role="textbox" contenteditable="true" data-role="editable" aria-multiline="true">
+							<p><span id="commentsPlaceHolder">Поделитесь своим мнением...</span></p></div>
+						</div>
+					</form>		
+				<a id="send_button"><span>Оставить сообщение</span></a>
+				
+				<div id="comment-list"></div>
 			</div>
-			<form class="comments" action="#">
-				<div class="comment-send-area">
-					<textarea name="user_comment" cols="50"
-					          rows="10"></textarea>
-				</div>
-			</form>
-			<a id="send_button"><span>Оставить сообщение</span></a>
-
-			<div id="comment-list"></div>
 			<script charset="utf-8" src="http://yandex.st/share/share.js"
 			        type="text/javascript"></script>
 		</div>

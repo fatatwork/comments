@@ -23,7 +23,7 @@
 								document.getElementById(targetHTMLid).innerHTML = request.responseText;
 								callback(true);
 							} else {
-								callback(false);
+								callback(false);ь
 								alert("Ошибка AJAX: Нет данных.");
 							}
 						} else {

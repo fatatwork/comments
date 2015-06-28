@@ -6,18 +6,6 @@ require_once '../funcLib.php';
 //адрес странички с которой перенаправляемься на авторизацию Http дописывается
 //тк window.location захватывает адрес целиком
 $_SESSION['page_url']  = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-if ( isset( $_COOKIE['first_name'] ) ) {
-	//echo "куки";
-	$userName = $_COOKIE['first_name'] . " " . $_COOKIE['last_name'];
-	$userLink = "http://vk.com/id".$_COOKIE['identity'];
-}else {
-	if(isset($_SESSION['first_name'])){
-		//echo "сессия";
-		$userName=$_SESSION['first_name']." ".$_SESSION['last_name'];
-		$userLink=$_SESSION['identity'];
-	}
-}
 ?>
 <!DOCTYPE html>
 <meta charset="UTF8">
@@ -39,7 +27,7 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 	<script type="text/javascript"
 	        src="http://www.bsmu.by/scripts/jquery.min.js"></script>
 	<script type="text/javascript" src="http://www.bsmu.by/scripts/upper.js"></script>
-	<link href="/comments/comments_style.css" rel="stylesheet" type="text/css">
+	<link href="/design/comments_style.css" rel="stylesheet" type="text/css">
 
 	<link rel="stylesheet" type="text/css"
 	      href="http://www.bsmu.by/style_main_ru.css">
@@ -266,7 +254,6 @@ if ( isset( $_COOKIE['first_name'] ) ) {
 				</div>
 			</form>		
 		<a id="send_button"><span>Оставить сообщение</span></a>
-		
 		<div id="comment-list"></div>
 	</div>
 
