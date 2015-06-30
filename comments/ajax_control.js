@@ -14,14 +14,18 @@ function getExistComments() {
 	var params='pageUrl='+window.location;
 	insertNewData(params, "../outComments.php", "comment-list", "POST");
 }
-getExistComments(); //Получаем уже существующие комментарии
-
 function getCookie(name) {
 	var matches = document.cookie.match(new RegExp(
 		"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
 	));
 	return matches ? decodeURIComponent(matches[1]) : undefined;
 }
+
+function getLoginStatusForAll(){
+	insertNewData("", "../getLoginStatusForAll.php", "user_info", "POST");
+}
+getExistComments(); //Получаем уже существующие комментарии
+getLoginStatusForAll();
 
 
 //Обрабатываем клик по кнопке
