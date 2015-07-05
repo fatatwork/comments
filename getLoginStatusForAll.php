@@ -20,7 +20,7 @@ if ( isset( $_COOKIE['up_key_fb'] ) ) {
 				$_POST['image']      = null;
 				$_POST['network']    = "facebook.com";
 				$_POST['identity']   = $userInfo['network_url'];
-				$networkPrefix="http://www.facebook.com/";
+				$networkPrefix="http://www.facebook.com/app_scoped_user_id/";
 			}
 		}
 if(isset($_COOKIE['up_key_fb']) || isset($_COOKIE['up_key_vk'])){

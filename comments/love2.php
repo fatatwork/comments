@@ -472,6 +472,7 @@ $_SESSION['page_url']  = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI
 <!--наши скрипт-->
 <script type="text/javascript" src="/comments/ajax_funcLib.js"></script>
 <script type="text/javascript" src="/comments/ajax_control.js"></script>
+<script type="text/javascript" src="/comments/yepnope.js"></script>
 
 
 <script src="http://www.bsmu.by/scripts/menu.js"

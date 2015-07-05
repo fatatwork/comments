@@ -5,9 +5,10 @@ var authorized;
 //айдишники проложений для социалок, эти айдишники будут фигурировать в названии кук
 var fbAppId= 403917006466762;
 var vkAppId = 4832378;
-var app_id = vk_api_add(); //Динамически добавляем скрипт API
-fb_api_add();
 var photoFb;//глобальная переменная для фотки из фесбука
+
+
+
 //Module/////////
 
 function getExistComments() {
@@ -38,51 +39,56 @@ $(document).ready(function() {
 	$('#send_button').bind('click', function() {
 		setTimeout("$('user_comment').val('')", 100);
 	});
-	setTimeout(function() {
-		VK.init({
-			apiId: app_id
-		});
-		FB.init({
-			appId: fbAppId,
-			xfbml: false,
-			cookie: true,
-			version: 'v2.3'
-		});
-		loadingInsert();
-		VK.Auth.getLoginStatus(contentChangeVK);
-		FB.getLoginStatus(function(response) {
-			contentChangeFB(response);
-		});
-
-	}, 1000);
+	//Загрузчик скриптов
+	yepnope({
+		test: vk_api_add.init() && fb_api_add.init(),
+		complete: function(url, result, key){
+			VK.init({
+				apiId: vkAppId
+			});
+			FB.init({
+				appId: fbAppId,
+				xfbml: false,
+				cookie: true,
+				version: 'v2.3'
+			});
+			loadingInsert();
+			VK.Auth.getLoginStatus(contentChangeVK);
+			FB.getLoginStatus(function(response) {
+				contentChangeFB(response);
+			});
+		}
+	})
 });
 
-function vk_api_add() {
-	app_id = vkAppId;
-	var script_added = false;
-	setTimeout(function() {
-		var el = document.createElement("script");
-		el.type = "text/javascript";
-		el.src = "//vk.com/js/api/openapi.js";
-		el.async = true;
-		document.getElementsByTagName("head")[0].appendChild(el);
-		script_added = true;
-	}, 0);
-	return app_id;
+var vk_api_add = {
+	init: function(){
+		setTimeout(function() {
+			var el = document.createElement("script");
+			el.type = "text/javascript";
+			el.src = "//vk.com/js/api/openapi.js";
+			el.async = true;
+			document.getElementsByTagName("head")[0].appendChild(el);
+			script_added = true;
+			return el.src;
+		}, 0);
+	}
 }
 
-function fb_api_add() {
-
-	(function(d, s, id) {
-		var js, fjs = d.getElementsByTagName(s)[0];
-		if (d.getElementById(id)) {
-			return;
-		}
-		js = d.createElement(s);
-		js.id = id;
-		js.src = "//connect.facebook.net/ru_RU/sdk.js";
-		fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));
+var fb_api_add = {
+	init: function(){
+		(function(d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) {
+				return;
+			}
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "//connect.facebook.net/ru_RU/sdk.js";
+			fjs.parentNode.insertBefore(js, fjs);
+			return js.src;
+		}(document, 'script', 'facebook-jssdk'));
+	}
 }
 
 //Controls/////////
