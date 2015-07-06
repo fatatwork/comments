@@ -21,12 +21,9 @@ $_SESSION['page_url']  = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI
 
 	<meta http-equiv="Content-Type" content="text/html; CHARSET=windows-1251">
 	<link href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700&subset=cyrillic-ext" rel="stylesheet" type="text/css">
+	<script src="http://www.bsmu.by/scripts/jquery.min.js" type="text/javascript"></script>
+	<script src="/comments/scriptsComLoader.js" type="text/javascript"></script>
 
-	
-
-	<script type="text/javascript"
-	        src="http://www.bsmu.by/scripts/jquery.min.js"></script>
-	<script type="text/javascript" src="http://www.bsmu.by/scripts/upper.js"></script>
 	<link href="/design/comments_style.css" rel="stylesheet" type="text/css">
 
 	<link rel="stylesheet" type="text/css"
@@ -467,17 +464,7 @@ $_SESSION['page_url']  = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI
 					width="60" height="56"/></a></p>
 	</div>
 </div>
-	
-
-<!--наши скрипт-->
-<script type="text/javascript" src="/comments/ajax_funcLib.js"></script>
-<script type="text/javascript" src="/comments/ajax_control.js"></script>
-<script type="text/javascript" src="/comments/yepnope.js"></script>
 
 
-<script src="http://www.bsmu.by/scripts/menu.js"
-        type="text/javascript"></script>
-<script src="http://www.bsmu.by/scripts/lang_box.js"
-        type="text/javascript"></script>
 </body>
 </html>

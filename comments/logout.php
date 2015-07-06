@@ -1,6 +1,7 @@
 <?php
 require_once '../app_config.php';
 if(true){ //Выход
+	echo "logout";
 	$access_path   = "/";
 	$access_domain = "comments.akson.by";
 	if($_COOKIE['up_key_vk']) setcookie('up_key_vk', $_COOKIE['up_key_vk'], time()-3600,  $access_path,
