@@ -6,7 +6,7 @@ if ( isset( $_COOKIE['up_key_vk'] ) ) {
 			$_POST['first_name'] = $userInfo['first_name'];
 			$_POST['last_name']  = $userInfo['last_name'];
 			$_POST['image']      = $userInfo['image'];
-			$_POST['network']    = "vk.com";
+			$_POST['network']    = $userInfo['network'];
 			$_POST['identity']   = $userInfo['network_url'];
 			$networkPrefix="http://vk.com/id";
 		}
@@ -17,16 +17,17 @@ if ( isset( $_COOKIE['up_key_fb'] ) ) {
 			if ( $userInfo ) {
 				$_POST['first_name'] = $userInfo['first_name'];
 				$_POST['last_name']  = $userInfo['last_name'];
-				$_POST['image']      = null;
-				$_POST['network']    = "facebook.com";
+				$_POST['image']      = $userInfo['image'];
+				$_POST['network']    = $userInfo['network'];
 				$_POST['identity']   = $userInfo['network_url'];
 				$networkPrefix="http://www.facebook.com/app_scoped_user_id/";
 			}
 		}
 if(isset($_COOKIE['up_key_fb']) || isset($_COOKIE['up_key_vk'])){
+	print_r($_POST);
 	echo "<div id='user_info'><div>
-				<a href='".$networkPrefix.$POST['identity']."'> <img id='avatar' src='".$POST['image']."'> </a>
-				<p>Вы вошли как:<a href='".$networkPrefix.$POST['identity']."'>".$_POST['first_name']." ".$_POST['last_name']."</a></p>
+				<a href='".$networkPrefix.$_POST['identity']."'> <img id='avatar' src='".$_POST['image']."'> </a>
+				<p>Вы вошли как:<a href='".$networkPrefix.$_POST['identity']."'>".$_POST['first_name']." ".$_POST['last_name']."</a></p>
 				<p><a id='vk_logout' onclick='vk_Logout()' href='#''>Выйти</a></p>
 				</div></div>";
 	} else {
