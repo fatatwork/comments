@@ -24,7 +24,6 @@ if ( isset( $_COOKIE['up_key_fb'] ) ) {
 			}
 		}
 if(isset($_COOKIE['up_key_fb']) || isset($_COOKIE['up_key_vk'])){
-	print_r($_POST);
 	echo "<div id='user_info'><div>
 				<a href='".$networkPrefix.$_POST['identity']."'> <img id='avatar' src='".$_POST['image']."'> </a>
 				<p>Вы вошли как:<a href='".$networkPrefix.$_POST['identity']."'>".$_POST['first_name']." ".$_POST['last_name']."</a></p>
