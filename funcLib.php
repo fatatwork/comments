@@ -23,10 +23,10 @@ function searchArticleById( $news_id ) {
 }
 
 function searchUser(
-	$username
+	$user_network_url
 ) {//ищем юзера по url возвращаем в качестве результата всю строку row
 	$query
-		= "SELECT * FROM users WHERE network_url = '{$username['identity']}';";//ищем есть ли такой же url в базе
+		= "SELECT * FROM users WHERE network_url = '{$user_network_url}';";//ищем есть ли такой же url в базе
 	$res = mysql_query( $query )
 	or die( "<p>Невозможно сделать запрос поиска пользователя: " . mysql_error()
 	        . "</p>" );
@@ -191,13 +191,13 @@ else $page_url = $_SESSION['page_url'];
 		$user_ip=$_SERVER["REMOTE_ADDR"];
 		if ( isset( $username ) ) {
 			$article_id = searchArticle( $page_url ); //Получаем идентификатор страницы на которой нужно разместить комментарий
-			$user_id = searchUser( $username );//первоначально ищем пользователя
+			$user_id = searchUser( $username['identity'] );//первоначально ищем пользователя
 			if($user_id){//Пишем коммент
 			 updateUser($username, $user_id, $user_ip);
 			}
 			else {//если юзера нет- добавляем и пишем коммент
 				addUser($username, $user_ip);
-				$user_id = searchUser($username);
+				$user_id = searchUser($username['identity']);
 			}
 			if($comment != "") addComment($article_id, $user_id, $comment);
 		}
@@ -242,7 +242,7 @@ function getHashForUser($network_url){
 	$res = mysql_query( $query )
 		or die( "<p>Невозможно сделать запрос поиска пользователя: " . mysql_error()
 		        . "</p>" );
-	$row = mysql_fetch_array( $res );//получение результата запроса из базы;
+	$row = mysql_fetch_row( $res );//получение результата запроса из базы;
 	return $row[0];
 }
 ?>

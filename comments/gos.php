@@ -31,7 +31,7 @@ $_SESSION['page_url'] = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'
 	<link rel="stylesheet" TYPE="text/css"
 	      HREF="http://www.bsmu.by/style_ru.css">
 	<link href="/design/comments_style.css" rel="stylesheet" type="text/css">
-
+	<script src="/comments/scriptsComLoader.js" type="text/javascript"></script>
 
 	<link href="http://www.bsmu.by/rss/rss.xml" rel="alternate"
 	      type="application/atom+xml" title="Atom 1.0"/>
@@ -392,9 +392,6 @@ $_SESSION['page_url'] = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'
 	</div>
 </div>
 
-<!--наши скрипт-->
-<script type="text/javascript" src="/comments/ajax_funcLib.js"></script>
-<script type="text/javascript" src="/comments/ajax_control.js"></script>
 
 <script src="http://www.bsmu.by/scripts/menu.js"
         type="text/javascript"></script>
