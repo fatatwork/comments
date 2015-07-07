@@ -4,6 +4,8 @@ var vk_link = "https://vk.com/js/api/openapi.js";
 
 var baseScripts = [
     "http://www.bsmu.by/scripts/upper.js",
+    fb_link,
+    vk_link,
     "/comments/ajax_funcLib.js",
     "/comments/ajax_control.js"
 ];
@@ -11,9 +13,9 @@ var baseScripts = [
 //Проверка статуса логина соцсетей
 var cookiePrefix = "up_key_";
 var activeCookie = cookiesIsSet(cookiePrefix);
-
-(activeCookie != undefined) ? baseScripts = apiChange(activeCookie.replace(cookiePrefix, ""), baseScripts) :
-    baseScripts = apiChange(null, baseScripts);
+//socNetName = activeCookie.replace(cookiePrefix, "");
+//(activeCookie != undefined) ? baseScripts = apiChange(activeCookie.replace(cookiePrefix, ""), baseScripts) :
+//    baseScripts = apiChange(null, baseScripts);
 
 //Загрузка скриптов
 loadScripts(baseScripts);
@@ -25,28 +27,25 @@ function apiChange(socID, baseScripts) {
         case 'vk':
         {
             baseScripts.push(vk_link);
-            baseScripts.push(fb_link);
             socNetName = "vk";
         }
             break;
         case 'fb':
         {
             baseScripts.push(fb_link);
-            baseScripts.push(vk_link);
             socNetName = "fb";
         }
             break;
         default:
         {
-            baseScripts.push(vk_link);
-            baseScripts.push(fb_link);
+            socNetName = undefined;
         }
             break;
     }
     return baseScripts;
 }
 
-function loadScripts(scripts_ex) {
+function loadScripts(scripts_ex, callback) {
     var scripts = scripts_ex;
     var src;
     var script;
@@ -91,6 +90,10 @@ function loadScripts(scripts_ex) {
         src = scripts.shift();
         loader();
     }
+    if(callback != undefined){
+        callback();
+    }
+
 }
 
 function cookiesIsSet(name_base) {

@@ -6,67 +6,64 @@ var authorized;
 fbAppId = 403917006466762;
 vkAppId = 4832378;
 var photoFb; //глобальная переменная для фотки из фесбука
-$(document).ready(function () {
+$(document).ready(function() {
     getExistComments(); //Получаем уже существующие комментарии
+    //!!!!!!ЗОНА ОТЛАДКИ!!!!!!!!!!!!!!!
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     getLoginStatusForAll();
-
-    //Обрабатываем клик по кнопке
-    var firstValue;
-
     //Social Networks Initializations
-
     //Нужно переписать - изменился HTML
-    $('#send_button').bind('click', function () {
+    /*$('#send_button').bind('click', function() {
         setTimeout("$('user_comment').val('')", 100);
-    });
+    });*/
     loadingInsert();
     initiateSocApi(socNetName);
 });
 
 function initiateSocApi(socID) {
     //Инициализация движков
-    switch (socID) {
-        case 'vk':
-        {
-            VK.init({
-                apiId: vkAppId
-            });
-            VK.Auth.getLoginStatus(contentChangeVK);
-        }
-            break;
-        case 'fb':
-        {
-            FB.init({
-                appId: fbAppId,
-                xfbml: false,
-                cookie: true,
-                version: 'v2.3'
-            });
-            FB.getLoginStatus(function (response) {
-                contentChangeFB(response);
-            });
-        }
-            break;
-    }
+    VK.init({
+        apiId: vkAppId
+    });
+    //VK.Auth.getLoginStatus(contentChangeVK);
+    FB.init({
+        appId: fbAppId,
+        xfbml: false,
+        cookie: true,
+        version: 'v2.3'
+    });
+    /*FB.getLoginStatus(function (response) {
+        contentChangeFB(response);
+    });*/
 }
-
 
 function getExistComments() {
     var params = 'pageUrl=' + window.location;
     insertNewData(params, "../outComments.php", "comment-list", "POST");
 }
 
+//Функция получает данные пользователя на основе универсальной куки и выводит их на страницу
 function getLoginStatusForAll() {
-    insertNewData("", "../getLoginStatusForAll.php", "user_info", "POST");
+    var userInfo;
+    insertNewData("", "../getLoginStatusForAll.php", null, "POST", function(ret) {
+        if (ret != undefined) {
+            if (ret == "null")
+                contentNotAuthView();
+            else {
+                userInfo = JSON.parse(ret);
+                contentAuthView(userInfo["user_link"], userInfo["first_name"], userInfo["last_name"], userInfo["image"]);
+            }
+        }
+    });
 }
 
 $("#send_button").click(
-    function () {
+    function() {
         var btn = this;
         if (authorized == true) {
             if (sendBtnLocked != true) {
                 var minCommentLength = 4;
-
                 /*Извлекаем текст комментария из текстового поля*/
                 var textArea = document.getElementById("user_comment");
                 var placeholder = document.getElementById("commentsPlaceHolder");
@@ -85,17 +82,8 @@ $("#send_button").click(
                         /*Параметры: пара = значение, отправляем комментарий, так же в яваскриппте проперяем какие куки уже есть на комп
                          и в зависмости от того для какой соцсетки - выбираем скрипт для отправки комментария*/
                         btnLock(btn);
-                        var addCommentsScript = undefined;
-                        var vkCookie = getCookie("vk_app_" + vkAppId);
-                        var fbCookie = getCookie("fbsr_" + fbAppId);
-                        var ourVkCookie = getCookie("up_key_vk");
-                        var ourFbCookie = getCookie("up_key_fb");
-
-                        if (vkCookie != undefined || ourVkCookie) addCommentsScript = "../addVkComments.php";
-                        if (fbCookie != undefined || ourFbCookie) addCommentsScript = "../addFbComments.php";
-
                         var params = 'currentComment=' + textOfComment + '&pageUrl=' + window.location + '&image=' + photoFb;
-                        insertNewData(params, addCommentsScript, "comment-list", "POST", function (readyflag) {
+                        insertNewData(params, "../addComment.php", "comment-list", "POST", function(readyflag) {
                             if (readyflag) {
                                 btnUnlock(btn);
                             } else {
@@ -121,11 +109,12 @@ function vk_auth() {
     //Отправляем строку с сессионными данными пользователя для проверки авторизации на стороне сервера
     loadingInsert();
     initiateSocApi("vk");
-    VK.Auth.login(function () { //Выводим попап
-        VK.Auth.getLoginStatus(function (response) {
+    VK.Auth.login(function() { //Выводим попап
+        VK.Auth.getLoginStatus(function(response) {
             if (response.session) {
-                contentChangeVK(response);
-                insertNewData(null, "../setVkCookie.php", null, "POST");
+                insertNewData(null, "../setVkCookie.php", null, "POST", function() {
+                    getLoginStatusForAll();
+                });
             }
         });
     });
@@ -135,109 +124,28 @@ function fb_auth() {
     //Отправляем строку с сессионными данными пользователя для проверки авторизации на стороне сервера
     loadingInsert();
     initiateSocApi("fb");
-    FB.login(function (response) { //Popup
-        FB.getLoginStatus(function (response) { //Проверяем статус логина
+    FB.login(function(response) { //Popup
+        FB.getLoginStatus(function(response) { //Проверяем статус логина
             if (response.status === 'connected') { //Если авторизовался
-                contentChangeFB(response); //Меняем внешний вид
-                insertNewData(null, "../setFbCookie.php", null, "POST");
+                insertNewData(null, "../setFbCookie.php", null, "POST", function() {
+                    getLoginStatusForAll();
+                });
             }
         });
-    }, {
-        scope: 'user_about_me'
     });
 }
 
 //Слушаем кнопку, ждем нажатия
-function vk_Logout() {
+function logoutFunc() {
     event.preventDefault();
     loadingInsert();
-    if (VK != false) {
-        VK.Auth.getLoginStatus(
-            function () {
-                VK.Auth.logout(
-                    function () {
-                        insertNewData(null, "logout.php", null, "POST");
-                        VK.Auth.getLoginStatus(contentChangeVK);
-                    }
-                );
-            }
-        );
-    } else insertNewData(params, "logout.php", null, "POST");
+    insertNewData(null, "../logout.php", null, "POST", function(ret) {
+        FB.logout();
+            if (ret != undefined)
+                if (ret == "logout")
+                    contentNotAuthView();
+    });
 }
-
-function fb_Logout() {
-    event.preventDefault();
-    loadingInsert();
-    if (FB != undefined) {
-        FB.logout(function (response) {
-            FB.getLoginStatus(function (response) { //Проверяем статус логина
-                if (response.status !== 'connected') {
-                    contentChangeFB()
-                    insertNewData(null, "logout.php", null, "POST");
-                }
-            });
-        });
-    } else insertNewData(params, "logout.php", null, "POST");
-}
-
-//View/////////
-function contentChangeVK(response) {
-
-    if (response.session) { //Авторизованный пользователь
-        var user_id = response.session.mid;
-        VK.Api.call('users.get', { //Запрашиваем данные пользователя
-                user_ids: user_id,
-                fields: 'photo_50',
-                name_case: 'nom'
-            },
-            function (ret) {
-                if (ret.response) {
-                    var userLink = "http://vk.com/id" + ret.response[0].uid;
-                    var firstName = ret.response[0].first_name;
-                    var lastName = ret.response[0].last_name;
-                    var photo = ret.response[0].photo_50;
-                    photoFb = photo;
-                    //Вызываем отрисовку данных о пользователе
-                    contentAuthView(userLink, firstName, lastName, photo, "vk");
-                }
-            })
-
-    } else { //Не авторизованный
-        contentNotAuthView();
-    }
-}
-
-function contentChangeFB(response) {
-    if (response) {
-        if (response.status === 'connected') {
-            // Logged into your app and Facebook.
-            FB.api('/me', function (ret) { //Запрашиваем данные пользователя
-                var userLink = ret["link"];
-                var firstName = ret["first_name"];
-                var lastName = ret["last_name"];
-                //Отдельный запрос для получения фотографии
-                FB.api('/me/picture', photoGetWrapper(userLink, firstName, lastName));
-
-                function photoGetWrapper(userLink, firstName, lastName) {
-                    //Замыкание
-                    return function (ret) {
-                        var photo = ret.data.url;
-                        contentAuthView(userLink, firstName, lastName, photo, "fb");
-                    }
-                }
-
-                ///
-
-            });
-        }
-    } else {
-        // The person is not logged into Facebook, so we're not sure if
-        // they are logged into this app or not.
-        contentNotAuthView();
-    }
-}
-
-///function contentChangeVK(response) {
 
 function deleteAllChilds(parent) {
     var childLength = parent.childNodes.length;
@@ -250,22 +158,22 @@ function textReplace(object, newText) {
     var defaultObjectText = object.innerHTML;
     object.innerHTML = newText;
     $(object).addClass("send_button_denied");
-    setTimeout(function () {
+    setTimeout(function() {
         $(object).removeClass("send_button_denied");
         object.innerHTML = defaultObjectText;
     }, errorTimeout);
 }
 
-function contentAuthView(userLink, first_name, last_name, photo, socNetID) {
+function contentAuthView(userLink, first_name, last_name, photo) {
     var infoBlock = document.getElementById("user_info");
     //Формируем вывод данных о пользователе
     deleteAllChilds(infoBlock);
     var authText = document.createElement("div");
     infoBlock.appendChild(authText);
     authText.innerHTML = "<a href='" + userLink + "'>" + "<img id='avatar' src='" + photo + "'/></a><p>Вы вошли как: <a href='" +
-    userLink + "'>" + first_name +
-    " " + last_name +
-    "</a></p><p><a id='vk_logout' onClick='" + socNetID + "_Logout()' href='#'>Выйти</a></p>";
+        userLink + "'>" + first_name +
+        " " + last_name +
+        "</a></p><p><a id='vk_logout' onClick='logoutFunc()' href='#'>Выйти</a></p>";
     authorized = true;
 }
 
@@ -289,7 +197,7 @@ function btnUnlock(btn) {
     $(btn).context.children[0].style.visibility = "visible";
     $(btn).removeClass("send_button_loading");
     $(btn).addClass("send_button_blocked");
-    setTimeout(function () { //Выставляем таймаут для спамеров
+    setTimeout(function() { //Выставляем таймаут для спамеров
         sendBtnLocked = false;
         $(btn).removeClass("send_button_blocked");
     }, antiSpamTimeout);
@@ -314,7 +222,7 @@ function loadingInsert() {
 
 function testAPI() {
     console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function (response) {
+    FB.api('/me', function(response) {
         console.log('Successful login for: ' + response.name);
         document.getElementById('status').innerHTML =
             'Thanks for logging in, ' + response.name + '!';

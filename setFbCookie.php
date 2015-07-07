@@ -12,6 +12,7 @@ FacebookSession::setDefaultApplication( FB_APP_ID, FB_APP_SECRET );
 
 //sdk facebook Facebook\FacebookJavaScriptLoginHelper;
 function loginFromFbSession() {
+	$username=array();
 	$helper = new FacebookJavaScriptLoginHelper();
 	try {
 		$session = $helper->getSession();
@@ -30,13 +31,13 @@ function loginFromFbSession() {
 			$response = $request->execute();
 			$user
 			                     = $response->getGraphObject( Facebook\GraphUser::className() );
-			$_POST['first_name'] = $user->getFirstName();
-			$_POST['last_name']  = $user->getLastName();
-			//$_POST['image'] инициализируется в яваскрипте
-			$_POST['identity'] = $user->getId();
-			$_POST['network']  = 'facebook.com';
+			$username['first_name'] = $user->getFirstName();
+			$username['last_name']  = $user->getLastName();
+			//$username['image'] инициализируется в яваскрипте
+			$username['identity'] = $user->getId();
+			$username['network']  = 'facebook.com';
 
-			return true;
+			return $username;
 		} catch ( \Facebook\FacebookRequestExceptiontException $ex ) {
 			echo "Exception occured, code: " . $ex->getCode();
 			echo " with message: " . $ex->getMessage();
@@ -47,15 +48,15 @@ function loginFromFbSession() {
 }
 
 function loginUser() {
-	$res = loginFromFbSession();
-	if ( $res ) {
-		$user_id = searchUser( $_POST['identity'] );
+	$username = loginFromFbSession();
+	if ( ($username)>0 ) {
+		$user_id = searchUser( $username['identity'] );
 		( $user_id )
-			? updateUser( $_POST, $user_id, $_SERVER["REMOTE_ADDR"] )
+			? updateUser( $username, $user_id, $_SERVER["REMOTE_ADDR"] )
 			:
-			addUser( $_POST, $_SERVER["REMOTE_ADDR"] );
+			addUser( $username, $_SERVER["REMOTE_ADDR"] );
 
-		$str           = getHashForUser( $_POST['identity'] );
+		$str           = getHashForUser( $username['identity'] );
 		$life_time     = time() + ( 60 * 60 * 24 * 7 );
 		$access_path   = "/";
 		$access_domain = "comments.akson.by";

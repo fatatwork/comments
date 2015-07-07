@@ -1,6 +1,5 @@
 sucessful = false;
 errorDelay = 10000;
-ajaxReturn = null;
 
 function insertNewData(params, php_script_path, targetHTMLid, method, callback) {
 	request = new ajaxRequest(); /*Создаем новый обьект запроса (функция снизу)*/
@@ -21,13 +20,17 @@ function makeAjaxRequest(request, callback, targetHTMLid) { //Цель этой 
 					if (targetHTMLid != null) { //Если есть необходимость делать вставку в документ
 						if (request.responseText !== "") {
 							document.getElementById(targetHTMLid).innerHTML = request.responseText;
-							callback(true);
+							if(callback != undefined)
+								callback(true);
 						} else {
-							callback(false);
+							if(callback != undefined)
+								callback(false);
 							alert("Ошибка AJAX: Нет данных.");
 						}
 					} else {
-						ajaxReturn = request.responseText;
+						if(callback != undefined){
+						callback(request.responseText);
+					}
 					}
 				} else {
 					alert("Ошибка AJAX: Данные не получены");

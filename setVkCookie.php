@@ -8,7 +8,6 @@ define( 'APP_SECRET', '7S006k5mPrcsGwGY7FCI' ); // Защищённый ключ
 //Парисим вконтактную куку, на момент парсинга в массиве пост уже лежит url страницы с новостью
 //и текст самого комментария
 $session = array();
-
 function authOpenAPIMember( $APP_ID, $APP_secret ) {
 	global $session;
 	$member     = false;
@@ -54,6 +53,7 @@ function authOpenAPIMember( $APP_ID, $APP_secret ) {
 
 function loginFromVkSession() {
 	global $session;
+	$username=array();
 	if ( isset( $_COOKIE[ 'vk_app_' . APP_ID ] ) ) {
 		$member = authOpenAPIMember( APP_ID, APP_SECRET );
 		if ( $member !== false ) {
@@ -74,28 +74,28 @@ function loginFromVkSession() {
 			if ( isset( $userInfo ) ) {
 				//допполняем массив пост данными из вконтакте,
 				//на момент дополнения в массиве уже лежат текст комментария и урл страницы
-				$_POST['first_name'] = $userInfo['first_name'];
-				$_POST['last_name']  = $userInfo['last_name'];
-				$_POST['image']      = $userInfo['photo_50'];
-				$_POST['network']    = "vk.com";
-				$_POST['identity']   = $userInfo['uid'];
+				$username['first_name'] = $userInfo['first_name'];
+				$username['last_name']  = $userInfo['last_name'];
+				$username['image']      = $userInfo['photo_50'];
+				$username['network']    = "vk.com";
+				$username['identity']   = $userInfo['uid'];
 
-				return true;
+				return $username;
 			} else	return false;
 		} else return false;
 	} else return false;
 }
 
 function loginUser() {
-	$res = loginFromVkSession();
-	if ( $res ) {
-		$user_id = searchUser( $_POST['identity'] );
+	$username = loginFromVkSession();
+	if ( sizeof($username)>0) {
+		$user_id = searchUser( $username['identity'] );
 		( $user_id )
-			? updateUser( $_POST, $user_id, $_SERVER["REMOTE_ADDR"] )
+			? updateUser( $username, $user_id, $_SERVER["REMOTE_ADDR"] )
 			:
-			addUser( $_POST, $_SERVER["REMOTE_ADDR"] );
+			addUser( $username, $_SERVER["REMOTE_ADDR"] );
 
-		$str           = getHashForUser( $_POST['identity'] );
+		$str           = getHashForUser( $username['identity'] );
 		$life_time     = time() + ( 60 * 60 * 24 * 7 );
 		$access_path   = "/";
 		$access_domain = "comments.akson.by";
