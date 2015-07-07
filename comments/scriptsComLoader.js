@@ -2,20 +2,32 @@ socNetName = undefined;
 
 var baseScripts = [
 	"http://www.bsmu.by/scripts/upper.js",
-	"/comments/ajax_funcLib.js"
+	"/comments/ajax_funcLib.js",
+	"//connect.facebook.net/ru_RU/sdk.js",
+	"//vk.com/js/api/openapi.js"
 ];
 
 //Проверка статуса логина соцсетей
-var activeCookie = cookiesIsSet("up_key_");
-if (activeCookie != "undefined") {
-	switch (activeCookie) {
-		case 'up_key_vk':
+var cookiePrefix = "up_key_"
+var activeCookie = cookiesIsSet(cookiePrefix);
+if (activeCookie != undefined) {
+	baseScripts = apiChange(activeCookie.replace(cookiePrefix, ""), baseScripts);
+}
+//Переключение загружаемого API
+baseScripts[baseScripts.length] = "/comments/ajax_control.js";
+//Загрузка скриптов
+loadScripts(baseScripts);
+
+function apiChange(socID, baseScripts) {
+
+	switch (socID) {
+		case 'vk':
 			{
 				baseScripts[baseScripts.length] = "//vk.com/js/api/openapi.js";
 				socNetName = "vk";
 			}
 			break;
-		case 'up_key_fb':
+		case 'fb':
 			{
 				baseScripts[baseScripts.length] = "//connect.facebook.net/ru_RU/sdk.js"
 				socNetName = "fb";
@@ -25,11 +37,8 @@ if (activeCookie != "undefined") {
 			socNetName = undefined;
 			break;
 	}
+	return baseScripts;
 }
-baseScripts[baseScripts.length] = "/comments/ajax_control.js";
-//Загрузка базовых скриптов модуля
-loadScripts(baseScripts);
-
 
 function loadScripts(scripts_ex) {
 	var scripts = scripts_ex;
@@ -38,21 +47,8 @@ function loadScripts(scripts_ex) {
 	var pendingScripts = [];
 	var firstScript = document.scripts[0];
 
-	// Watch scripts load in IE
-	function stateChange() {
-		// Execute as many scripts in order as we can
-		var pendingScript;
-		while (pendingScripts[0] && pendingScripts[0].readyState == 'loaded') {
-			pendingScript = pendingScripts.shift();
-			// avoid future loading events from this script (eg, if src changes)
-			pendingScript.onreadystatechange = null;
-			// can't just appendChild, old IE bug if element isn't closed
-			firstScript.parentNode.insertBefore(pendingScript, firstScript);
-		}
-	}
-
-	// loop through our script urls
-	while (src = scripts.shift()) {
+	function loader() {
+		// loop through our script urls
 		if ('async' in firstScript) { // modern browsers
 			script = document.createElement('script');
 			script.async = false;
@@ -70,6 +66,24 @@ function loadScripts(scripts_ex) {
 		} else { // fall back to defer
 			document.write('<script src="' + src + '" defer></' + 'script>');
 		}
+	}
+
+	// Watch scripts load in IE
+	function stateChange() {
+		// Execute as many scripts in order as we can
+		var pendingScript;
+		while (pendingScripts[0] && pendingScripts[0].readyState == 'loaded') {
+			pendingScript = pendingScripts.shift();
+			// avoid future loading events from this script (eg, if src changes)
+			pendingScript.onreadystatechange = null;
+			// can't just appendChild, old IE bug if element isn't closed
+			firstScript.parentNode.insertBefore(pendingScript, firstScript);
+		}
+	}
+
+	while (scripts.length != 0) {
+		src = scripts.shift();
+		loader();
 	}
 }
 

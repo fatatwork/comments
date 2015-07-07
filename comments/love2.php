@@ -39,7 +39,6 @@ $_SESSION['page_url']  = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI
 
 </head>
 <body>
-
 <div id="naviP">
 	<div class="defaultP" id="menuP">
 		<ul>

@@ -23,6 +23,7 @@ if ( isset( $_COOKIE['up_key_fb'] ) ) {
 				$networkPrefix="http://www.facebook.com/app_scoped_user_id/";
 			}
 		}
+
 if(isset($_COOKIE['up_key_fb']) || isset($_COOKIE['up_key_vk'])){
 	echo "<div id='user_info'><div>
 				<a href='".$networkPrefix.$_POST['identity']."'> <img id='avatar' src='".$_POST['image']."'> </a>
