@@ -5,18 +5,13 @@ var authorized;
 //айдишники проложений для социалок, эти айдишники будут фигурировать в названии кук
 fbAppId = 403917006466762;
 vkAppId = 4832378;
+okAppId = 1146120960;
+gooClientID = "1060114582002-giddsvfq6rg7tdjhoqcp3p9d73672mvc.apps.googleusercontent.com";
+gooClientSecret = "61cS8y9q37NzzyLE0VcPCdxR";
 var photoFb; //глобальная переменная для фотки из фесбука
 $(document).ready(function() {
     getExistComments(); //Получаем уже существующие комментарии
-    //!!!!!!ЗОНА ОТЛАДКИ!!!!!!!!!!!!!!!
-
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     getLoginStatusForAll();
-    //Social Networks Initializations
-    //Нужно переписать - изменился HTML
-    /*$('#send_button').bind('click', function() {
-        setTimeout("$('user_comment').val('')", 100);
-    });*/
     loadingInsert();
     initiateSocApi(socNetName);
 });
@@ -33,9 +28,10 @@ function initiateSocApi(socID) {
         cookie: true,
         version: 'v2.3'
     });
-    /*FB.getLoginStatus(function (response) {
-        contentChangeFB(response);
-    });*/
+
+    var rParams = FAPI.Util.getRequestParameters();
+    FAPI.init(rParams["api_server"], rParams["apiconnection"]);
+
 }
 
 function getExistComments() {
@@ -58,52 +54,51 @@ function getLoginStatusForAll() {
     });
 }
 
-$("#send_button").click(
-    function() {
-        var btn = this;
-        if (authorized == true) {
-            if (sendBtnLocked != true) {
-                var minCommentLength = 4;
-                /*Извлекаем текст комментария из текстового поля*/
-                var textArea = document.getElementById("user_comment");
-                var placeholder = document.getElementById("commentsPlaceHolder");
-                var textOfComment = textArea.innerText;
-                if (placeholder != undefined) {
-                    var holderText = placeholder.innerText;
-                    //Поиск текста из плейсхолдера - не считается комментарием
-                    if (textOfComment.indexOf(holderText) != -1) {
-                        textOfComment = undefined;
-                    }
+function sendBtnAction() {
+    var btn = document.getElementById("send_button");
+    if (authorized == true) {
+        if (sendBtnLocked != true) {
+            var minCommentLength = 4;
+            /*Извлекаем текст комментария из текстового поля*/
+            var textArea = document.getElementById("user_comment");
+            var placeholder = document.getElementById("commentsPlaceHolder");
+            var textOfComment = textArea.innerText;
+            if (placeholder != undefined) {
+                var holderText = placeholder.innerText;
+                //Поиск текста из плейсхолдера - не считается комментарием
+                if (textOfComment.indexOf(holderText) != -1) {
+                    textOfComment = undefined;
                 }
-                if (textOfComment != undefined) {
-                    if (textOfComment.length >= minCommentLength) {
+            }
+            if (textOfComment != undefined) {
+                if (textOfComment.length >= minCommentLength) {
 
-                        ////////////////////
-                        /*Параметры: пара = значение, отправляем комментарий, так же в яваскриппте проперяем какие куки уже есть на комп
-                         и в зависмости от того для какой соцсетки - выбираем скрипт для отправки комментария*/
-                        btnLock(btn);
-                        var params = 'currentComment=' + textOfComment + '&pageUrl=' + window.location + '&image=' + photoFb;
-                        insertNewData(params, "../addComment.php", "comment-list", "POST", function(readyflag) {
-                            if (readyflag) {
-                                btnUnlock(btn);
-                            } else {
-                                textReplace(btn, "<span>Ошибка отправки</span>")
-                            }
-                        });
+                    ////////////////////
+                    /*Параметры: пара = значение, отправляем комментарий, так же в яваскриппте проперяем какие куки уже есть на комп
+                     и в зависмости от того для какой соцсетки - выбираем скрипт для отправки комментария*/
+                    btnLock(btn);
+                    var params = 'currentComment=' + textOfComment + '&pageUrl=' + window.location + '&image=' + photoFb;
+                    insertNewData(params, "../addComment.php", "comment-list", "POST", function(readyflag) {
+                        if (readyflag) {
+                            btnUnlock(btn);
+                        } else {
+                            textReplace(btn, "<span>Ошибка отправки</span>")
+                        }
+                    });
 
-                    } else {
-                        textReplace(btn, "<span>Слишком короткое сообщение.</span>");
-                    }
                 } else {
-                    textReplace(btn, "<span>Вы ничего не написали</span>")
+                    textReplace(btn, "<span>Слишком короткое сообщение.</span>");
                 }
             } else {
-                textReplace(btn, "<span>Подождите " + antiSpamTimeout / 1000 + " секунд.</span>");
+                textReplace(btn, "<span>Вы ничего не написали</span>")
             }
         } else {
-            textReplace(btn, "<span>Сначала Вам необходимо войти.</span>");
+            textReplace(btn, "<span>Подождите " + antiSpamTimeout / 1000 + " секунд.</span>");
         }
-    });
+    } else {
+        textReplace(btn, "<span>Сначала Вам необходимо войти.</span>");
+    }
+}
 
 function vk_auth() {
     //Отправляем строку с сессионными данными пользователя для проверки авторизации на стороне сервера
@@ -135,17 +130,35 @@ function fb_auth() {
     });
 }
 
+function ok_auth() {
+    //FAPI.UI.showPermissions("[\"" + "EVENTS" + "\"]");
+    window.open("http://www.odnoklassniki.ru/oauth/authorize?client_id=" + okAppId + "&response_type=code&redirect_uri='/setOkCookie.php'")
+
+}
+
+//Callback ok.ru - требование документации
+/*function API_callback(method, result, data){
+    alert(result);
+}*/
+
 //Слушаем кнопку, ждем нажатия
 function logoutFunc() {
     event.preventDefault();
     loadingInsert();
     insertNewData(null, "../logout.php", null, "POST", function(ret) {
+        //Выход из фейсбука
         FB.logout();
-            if (ret != undefined)
-                if (ret == "logout")
-                    contentNotAuthView();
+        //Выход из Google Plus
+        GooglePlusLogOut();
+        render();
+        document.location.href = document.location.href;
+        //Изименение представления
+        if (ret != undefined)
+            if (ret == "logout")
+                contentNotAuthView();
     });
 }
+
 
 function deleteAllChilds(parent) {
     var childLength = parent.childNodes.length;
@@ -182,7 +195,12 @@ function contentNotAuthView() {
     deleteAllChilds(infoBlock);
     var logoutText = document.createElement("div");
     logoutText.id = "Login";
-    logoutText.innerHTML = "<p>Вы не авторизированы. Войдите через соц-сеть</p><a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a><a id='fb_auth' onClick='fb_auth()'><img src='../design/fb_icon.png'></a>"
+    logoutText.innerHTML = "<p>Вы не авторизированы. Войдите через соц-сеть</p>" +
+        "<a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a>" +
+        "<a id='fb_auth' onClick='fb_auth()'><img src='../design/fb_icon.png'></a>" +
+        "<div id='customBtn' class='customGPlusSignIn'> <img src='../design/google_icon.png'>" +
+        "</div>" +
+        "<a id='ok_auth' onClick='ok_auth()'><img src='../design/fb_icon.png'></a>";
     infoBlock.appendChild(logoutText);
     authorized = false;
 }

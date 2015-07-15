@@ -21,11 +21,12 @@ $_SESSION['page_url']
 	<meta http-equiv="X-UA-Compatible" content="IE=9">
 
 	<meta http-equiv="Content-Type" content="text/html; CHARSET=windows-1251">
+	<meta name="google-signin-client_id" content="1060114582002-giddsvfq6rg7tdjhoqcp3p9d73672mvc.apps.googleusercontent.com">
 	<link
 		href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700&subset=cyrillic-ext"
 		rel="stylesheet" type="text/css">
-	<script src="http://www.bsmu.by/scripts/jquery.min.js"
-	        type="text/javascript"></script>
+	<script type="text/javascript"
+	        src="http://www.bsmu.by/scripts/jquery.min.js"></script>
 	<script src="/comments/scriptsComLoader.js" type="text/javascript"></script>
 
 	<link href="/design/comments_style.css" rel="stylesheet" type="text/css">
@@ -250,6 +251,7 @@ $_SESSION['page_url']
 			     class="yashare-auto-init"></div>
 			<!-- Модуль комментариев -->
 			<div id="comments_module">
+				<a name="comm_btns"></a>
 				<div id="user_info"></div>
 				<form class="comments" action="#">
 					<div class="comment-send-area">
@@ -260,7 +262,7 @@ $_SESSION['page_url']
 							</p></div>
 					</div>
 				</form>
-				<a id="send_button"><span>Оставить сообщение</span></a>
+				<a id="send_button" onClick="sendBtnAction()"><span>Оставить сообщение</span></a>
 
 				<div id="comment-list"></div>
 			</div>

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'funcLib.php';
+require_once 'app_config.php';
 
 define( 'APP_ID', '4832378' ); // ID приложения
 define( 'APP_SECRET', '7S006k5mPrcsGwGY7FCI' ); // Защищённый ключ
@@ -53,7 +54,7 @@ function authOpenAPIMember( $APP_ID, $APP_secret ) {
 
 function loginFromVkSession() {
 	global $session;
-	$username=array();
+	$username = array();
 	if ( isset( $_COOKIE[ 'vk_app_' . APP_ID ] ) ) {
 		$member = authOpenAPIMember( APP_ID, APP_SECRET );
 		if ( $member !== false ) {
@@ -72,7 +73,7 @@ function loginFromVkSession() {
 				$userInfo = $userInfo['response'][0];
 			}
 			if ( isset( $userInfo ) ) {
-				//допполняем массив пост данными из вконтакте,
+				//дополняем массив пост данными из вконтакте,
 				//на момент дополнения в массиве уже лежат текст комментария и урл страницы
 				$username['first_name'] = $userInfo['first_name'];
 				$username['last_name']  = $userInfo['last_name'];
@@ -81,34 +82,18 @@ function loginFromVkSession() {
 				$username['identity']   = $userInfo['uid'];
 
 				return $username;
-			} else	return false;
-		} else return false;
-	} else return false;
-}
-
-function loginUser() {
-	$username = loginFromVkSession();
-	if ( sizeof($username)>0) {
-		$user_id = searchUser( $username['identity'] );
-		( $user_id )
-			? updateUser( $username, $user_id, $_SERVER["REMOTE_ADDR"] )
-			:
-			addUser( $username, $_SERVER["REMOTE_ADDR"] );
-
-		$str           = getHashForUser( $username['identity'] );
-		$life_time     = time() + ( 60 * 60 * 24 * 7 );
-		$access_path   = "/";
-		$access_domain = "comments.akson.by";
-		setcookie( 'up_key_vk', $str, $life_time, $access_path,
-			$access_domain );
-		if ( $_COOKIE['up_key_fb'] ) {
-			setcookie( 'up_key_fb', $_COOKIE['up_key_fb'], time() - 3600,
-				$access_path,
-				$access_domain );
+			} else {
+				return false;
+			}
+		} else {
+			return false;
 		}
+	} else {
+		return false;
 	}
 }
 
-loginUser();
+$userName = loginFromVkSession();
+if(sizeof($userName)>0) setUserCookie( $userName, 'up_key_vk' );
 
 ?>

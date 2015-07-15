@@ -48,8 +48,8 @@ $_SESSION['page_url'] = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'
 	      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 </HEAD>
-<BODY>
 
+<BODY>
 <div id="naviP">
 	<div class="defaultP" id="menuP">
 		<ul>

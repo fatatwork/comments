@@ -12,8 +12,8 @@ FacebookSession::setDefaultApplication( FB_APP_ID, FB_APP_SECRET );
 
 //sdk facebook Facebook\FacebookJavaScriptLoginHelper;
 function loginFromFbSession() {
-	$username=array();
-	$helper = new FacebookJavaScriptLoginHelper();
+	$username = array();
+	$helper   = new FacebookJavaScriptLoginHelper();
 	try {
 		$session = $helper->getSession();
 		//print_r($session);
@@ -30,7 +30,7 @@ function loginFromFbSession() {
 			$request  = new FacebookRequest( $session, 'GET', '/me' );
 			$response = $request->execute();
 			$user
-			                     = $response->getGraphObject( Facebook\GraphUser::className() );
+			                        = $response->getGraphObject( Facebook\GraphUser::className() );
 			$username['first_name'] = $user->getFirstName();
 			$username['last_name']  = $user->getLastName();
 			//$username['image'] инициализируется в яваскрипте
@@ -47,29 +47,8 @@ function loginFromFbSession() {
 	}
 }
 
-function loginUser() {
-	$username = loginFromFbSession();
-	if ( ($username)>0 ) {
-		$user_id = searchUser( $username['identity'] );
-		( $user_id )
-			? updateUser( $username, $user_id, $_SERVER["REMOTE_ADDR"] )
-			:
-			addUser( $username, $_SERVER["REMOTE_ADDR"] );
+$userName = loginFromFbSession();
+if(sizeof($userName)>0) setUserCookie( $userName, 'up_key_fb' );
 
-		$str           = getHashForUser( $username['identity'] );
-		$life_time     = time() + ( 60 * 60 * 24 * 7 );
-		$access_path   = "/";
-		$access_domain = "comments.akson.by";
-		setcookie( 'up_key_fb', $str, $life_time, $access_path,
-			$access_domain );
-		if ( $_COOKIE['up_key_vk'] ) {
-			setcookie( 'up_key_vk', $_COOKIE['up_key_vk'], time() - 3600,
-				$access_path,
-				$access_domain );
-		}
-	}
-}
-
-loginUser();
 
 ?>

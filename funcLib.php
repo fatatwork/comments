@@ -1,6 +1,6 @@
 <?php
 require_once 'connectDB.php';
-define('HASH_PREFIX', 'bsmu_');
+define( 'HASH_PREFIX', 'bsmu_' );
 function searchArticle( $page_adress ) {
 	$query = "SELECT id FROM news WHERE link = '{$page_adress}';";
 	$result = mysql_query( $query )
@@ -43,7 +43,8 @@ function searchUserById( $user_id ) {
 	$row = mysql_fetch_array( $res );//получение результата запроса из базы;
 	return $row;
 }
-function getUserByHash($hash){
+
+function getUserByHash( $hash ) {
 	$query
 		= "SELECT first_name, last_name, image, network_url, user_hash FROM users WHERE user_hash = '{$hash}'";//ищем есть ли такой же url в базе
 	$res = mysql_query( $query )
@@ -52,25 +53,25 @@ function getUserByHash($hash){
 	$row = mysql_fetch_array( $res );//получение результата запроса из базы;
 	return $row;
 }
-function addUser( $username, $user_ip ) {//добавление пользователя
-	if ( isset( $username['first_name'], $username['last_name'], $username['identity'] ) ) {
-		$hash_str = sha1(HASH_PREFIX.$username['identity']);
+
+function addUser( $userName, $user_ip ) {//добавление пользователя
+	if ( isset( $userName['first_name'], $userName['last_name'], $userName['identity'] ) ) {
+		$hash_str = sha1( HASH_PREFIX . $userName['identity'] );
 		$query
-			=
-			"INSERT INTO users (first_name, last_name, image, network, network_url,user_hash, user_ip)
-			VALUES ('{$username['first_name']}', '{$username['last_name']}','{$username['image']}', 
-				'{$username['network']}', '{$username['identity']}', '{$hash_str}', INET_ATON('{$user_ip}' ));";
+		          = "INSERT INTO users (first_name, last_name, image, network, network_url,user_hash, user_ip)
+			VALUES ('{$userName['first_name']}', '{$userName['last_name']}','{$userName['image']}', 
+				'{$userName['network']}', '{$userName['identity']}', '{$hash_str}', INET_ATON('{$user_ip}' ));";
 		$result = mysql_query( $query )
 		or die( "<p>Невозможно добавить пользователя " . mysql_error()
 		        . "</p>" );
 	}
 }
 
-function updateUser( $username, $user_id, $user_ip ) {
-	$query  =
-		"UPDATE users SET first_name='{$username['first_name']}',last_name='{$username['last_name']}', image='{$username['image']}', 
+function updateUser( $userName, $user_id, $user_ip ) {
+	$query
+		    = "UPDATE users SET first_name='{$userName['first_name']}',last_name='{$userName['last_name']}', image='{$userName['image']}',
 		user_ip=INET_ATON('{$user_ip}') WHERE user_id='{$user_id}';";
-	$result   = mysql_query( $query );
+	$result = mysql_query( $query );
 }
 
 function addComment( $article_id, $user_id, $comment ) {//добавляем комментарий
@@ -80,17 +81,20 @@ function addComment( $article_id, $user_id, $comment ) {//добавляем к�
 	if ( $ban_time[0] != 0 ) {
 		return false;
 	}
-	$query  = "INSERT INTO comments (news_id, user_id, comment, add_time) 
+	$query = "INSERT INTO comments (news_id, user_id, comment, add_time)
 	          VALUES ('{$article_id}', '{$user_id}', '{$comment}', NOW());";
 	$res = mysql_query( $query )
 	or die( "<p>Невозможно сделать запись комментария: " . mysql_error()
 	        . "</p>" );
-	if ( $res )	return true;
-    else return false;
+	if ( $res ) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function getComments( $page_adress ) {
-	 //INET_ATON-преобразует ip В число и INET_NTOA-число в ip
+	//INET_ATON-преобразует ip В число и INET_NTOA-число в ip
 	$newsID     = searchArticle( $page_adress );
 	$actualTime = time();
 	//Создаем запрос на слияние данных о пользователях с данными об их комментариях
@@ -101,12 +105,16 @@ function getComments( $page_adress ) {
 	or die( "<p>Невозможно получить данные о комментариях: " . mysql_error()
 	        . "</p>" );
 	$commentArray = array();
-	while ( $row = mysql_fetch_array( $result_obj ) ) { //Сюда должна лечь новая строка ассоциативного массива
-		if($row!=null || $row!=false) array_push( $commentArray, $row );
+	while ( $row
+		= mysql_fetch_array( $result_obj ) ) { //Сюда должна лечь новая строка ассоциативного массива
+		if ( $row != null || $row != false ) {
+			array_push( $commentArray, $row );
+		}
 	}
 
 	return $commentArray;
 }
+//получение списка существующих пользователей
 function getUsers() {
 	$query = "SELECT * FROM users ORDER BY last_name";
 	$result = mysql_query( $query )
@@ -119,21 +127,27 @@ function getUsers() {
 
 	return $usersArray;
 }
-
+//бан пользователя
 function banUser( $user_id, $ban_time ) {
-	if($ban_time){
-		switch($ban_time){
-			case 'day': $ban_time=time()+24*3600;
+	if ( $ban_time ) {
+		switch ( $ban_time ) {
+			case 'day':
+				$ban_time = time() + 24 * 3600;
 				break;
-			case 'week': $ban_time=time()+7*24*3600;
+			case 'week':
+				$ban_time = time() + 7 * 24 * 3600;
 				break;
-			case 'month': $ban_time=time()+31*24*3600;
+			case 'month':
+				$ban_time = time() + 31 * 24 * 3600;
 				break;
-			case 'year': $ban_time=time()+12*31*24*3600;
+			case 'year':
+				$ban_time = time() + 12 * 31 * 24 * 3600;
 				break;
-			case 'forever': $ban_time=-1;
+			case 'forever':
+				$ban_time = - 1;
 				break;
-			default: break;
+			default:
+				break;
 		}
 	}
 	$query
@@ -141,10 +155,10 @@ function banUser( $user_id, $ban_time ) {
 	$res = mysql_query( $query ) or die( "<p>Невозможно забанить пользователя: "
 	                                     . mysql_error() . "</p>" );
 }
-
+//получение списка забаненых пользователей
 function getBannedUsers() {
 	$query
-	      = "SELECT user_id  FROM users WHERE ban_time!=0;";
+		= "SELECT user_id  FROM users WHERE ban_time!=0;";
 	$result = mysql_query( $query )
 	or die( "<p>Невозможно получить данные о пользователях: " . mysql_error()
 	        . "</p>" );
@@ -155,10 +169,10 @@ function getBannedUsers() {
 
 	return $usersArray;
 }
-
+//получение списка существующих статей
 function getArticles() {
-	$query          = "SELECT * FROM news ORDER BY date;";
-	$res            = mysql_query( $query )
+	$query = "SELECT * FROM news ORDER BY date;";
+	$res = mysql_query( $query )
 	or die( "<p>Невозможно получить список новостей: " . mysql_error()
 	        . "</p>" );
 	$articles_array = array();
@@ -168,80 +182,125 @@ function getArticles() {
 
 	return $articles_array;
 }
-function deleteComment($comment_id){
-	$query="UPDATE comments SET deleted=1 WHERE id='{$comment_id}';";
-	$res            = mysql_query( $query )
+//удяление комментария
+function deleteComment( $comment_id ) {
+	$query = "UPDATE comments SET deleted=1 WHERE id='{$comment_id}';";
+	$res = mysql_query( $query )
 	or die( "<p>Невозможно удалить комментарий: " . mysql_error()
 	        . "</p>" );
 }
-function addCommentFromPage(){
-	if ( isset( $_POST['first_name'], $_POST['last_name'] ) ) {
-	$username['first_name'] = $_POST['first_name'];
-	$username['last_name']  = $_POST['last_name'];
-	$username['image']		= $_POST['image'];
-	$username['network']    = $_POST['network'];
-	$username['identity']   = $_POST['identity'];
+/*добавляем коммментарий на существующую страницу , для этого мы запихиваем в пост
+массив все данные о том кто и что анписал, после чего функция забирает данныне из пост массива и доабвляет в базу*/
+function addCommentFromPage($userName) {
+	if ( isset( $_POST['pageUrl'] ) ) {
+		$page_url = $_POST['pageUrl'];
+	} else {
+		$page_url = $_SESSION['page_url'];
 	}
-if(isset($_POST['pageUrl'])) $page_url=$_POST['pageUrl'];
-else $page_url = $_SESSION['page_url'];
 
-	if(isset($_POST['currentComment'])){
+	if ( isset( $_POST['currentComment'] ) ) {
 		$comment = trim( $_POST['currentComment'] );
-		$user_ip=$_SERVER["REMOTE_ADDR"];
-		if ( isset( $username ) ) {
-			$article_id = searchArticle( $page_url ); //Получаем идентификатор страницы на которой нужно разместить комментарий
-			$user_id = searchUser( $username['identity'] );//первоначально ищем пользователя
-			if($user_id){//Пишем коммент
-			 updateUser($username, $user_id, $user_ip);
+		$user_ip = $_SERVER["REMOTE_ADDR"];
+		if ( isset( $userName ) ) {
+			$article_id
+				= searchArticle( $page_url ); //Получаем идентификатор страницы на которой нужно разместить комментарий
+			$user_id
+				= searchUser( $userName['identity'] );//первоначально ищем пользователя
+			if ( $user_id ) {//Пишем коммент
+				updateUser( $userName, $user_id, $user_ip );
+			} else {//если юзера нет- добавляем и пишем коммент
+				addUser( $userName, $user_ip );
+				$user_id = searchUser( $userName['identity'] );
 			}
-			else {//если юзера нет- добавляем и пишем коммент
-				addUser($username, $user_ip);
-				$user_id = searchUser($username['identity']);
+			if ( $comment != "" ) {
+				addComment( $article_id, $user_id, $comment );
 			}
-			if($comment != "") addComment($article_id, $user_id, $comment);
 		}
 	}
 }
-function getCommentsFromPage(){
-	if(isset($_POST['pageUrl']))$commentOut = getComments($_POST['pageUrl']); //Получаем комментарии
-	else $commentOut=getComments($_SESSION['page_url']);
-	$html_text=array();
-	if(is_array($commentOut) && sizeof($commentOut)>0){
-		$commentOut = array_reverse($commentOut, true);
-		foreach($commentOut as $comment){
-			switch ($comment['network']) {
+//получаем текущие существующие комментарии со страницы
+function getCommentsFromPage() {
+	if ( isset( $_POST['pageUrl'] ) ) {
+		$commentOut = getComments( $_POST['pageUrl'] );
+	} //Получаем комментарии
+	else {
+		$commentOut = getComments( $_SESSION['page_url'] );
+	}
+	$html_text = array();
+	if ( is_array( $commentOut ) && sizeof( $commentOut ) > 0 ) {
+		$commentOut = array_reverse( $commentOut, true );
+		foreach ( $commentOut as $comment ) {
+			switch ( $comment['network'] ) {
 				case 'vk.com':
-					$networkPrefix='http://vk.com/id';
+					$networkPrefix = 'http://vk.com/id';
 					break;
 				case 'facebook.com':
-					$networkPrefix='http://www.facebook.com/';
+					$networkPrefix = 'http://www.facebook.com/';
+					break;
+				case 'plus.google.com':
+					$networkPrefix='https://plus.google.com/u/0/';
 					break;
 			}
-			$text="<div class='comment'>".
-			/*вывод аватарки
+			$text = "<div class='comment'>" .
+			        /*вывод аватарки
 			"<a href=\"http://vk.com/id".$comment['network_url']."\">".
 			"<img src=\"".$comment['image']."\"/></a>".*/
-			"<span> <h4>"."<a href=".$networkPrefix.$comment['network_url'].">".
-			$comment['first_name'] . " " . $comment['last_name'] . "</a> " 
-			. $comment['add_time'] . "</h4>" . $comment['comment']."</span>".
-			"</div>";
-			array_push($html_text, $text);
+			        "<span> <h4>" . "<a href=" . $networkPrefix
+			        . $comment['network_url'] . ">" .
+			        $comment['first_name'] . " " . $comment['last_name']
+			        . "</a> "
+			        . $comment['add_time'] . "</h4>" . $comment['comment']
+			        . "</span>" .
+			        "</div>";
+			array_push( $html_text, $text );
 		}
-	}else{
-		$text= "<div class='comment'>
+	} else {
+		$text
+			= "<div class='comment'>
 				<span><p> Пока нет комментариев...</p></span>
 			  </div>";
-		array_push($html_text, $text);
+		array_push( $html_text, $text );
 	}
+
 	return $html_text;
 }
-function getHashForUser($network_url){
+//получаем хэш пользователя по его айдишнику в соцсети
+function getHashForUser( $network_url ) {
 
-	$query = "SELECT user_hash FROM users WHERE network_url = '{$network_url}'";//ищем есть ли такой же url в базе
+	$query
+		= "SELECT user_hash FROM users WHERE network_url = '{$network_url}'";//ищем есть ли такой же url в базе
 	$res = mysql_query( $query )
-		or die( "<p>Невозможно сделать запрос поиска пользователя: " . mysql_error()
-		        . "</p>" );
+	or die( "<p>Невозможно сделать запрос поиска пользователя: " . mysql_error()
+	        . "</p>" );
 	$row = mysql_fetch_array( $res );//получение результата запроса из базы;
 	return $row['user_hash'];
 }
+///функция получает готовый массив с данными из соц сетки, проверяет ест ли пользователь из массива
+//в базе, и если есть то обновляет о нем инфу, естли нет - то добавляет нового пользователя
+//и после чего устанавливает куку
+function setUserCookie( $userName, $cookieName ) {
+
+	$user_id = searchUser( $userName['identity'] );
+	( $user_id )
+		? updateUser( $userName, $user_id, $_SERVER["REMOTE_ADDR"] )
+		:
+		addUser( $userName, $_SERVER["REMOTE_ADDR"] );
+
+	$str       = getHashForUser( $userName['identity'] );
+	$life_time = time() + ( 60 * 60 * 24 * 7 );
+	setcookie( $cookieName, $str, $life_time, ACCESS_PATH,
+		ACCESS_DOMAIN );
+	deleteOtherCookie($cookieName, $str);
+}
+//функция удаляет все ненужные куки(в один момент времени может бытьу станвлена только одна кука)
+function deleteOtherCookie($cookieName, $str){
+	$life_time=-3600;
+	if(isset($_COOKIE['up_key_vk']) && $cookieName!='up_key_vk') setcookie( $cookieName, $str, $life_time, ACCESS_PATH,
+		ACCESS_DOMAIN );
+	if(isset($_COOKIE['up_key_fb']) && $cookieName!='up_key_fb') setcookie( $cookieName, $str, $life_time, ACCESS_PATH,
+		ACCESS_DOMAIN );
+	if(isset($_COOKIE['up_key_gp']) && $cookieName!='up_key_gp') setcookie( $cookieName, $str, $life_time, ACCESS_PATH,
+		ACCESS_DOMAIN );
+}
+
 ?>

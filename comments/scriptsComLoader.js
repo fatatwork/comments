@@ -1,13 +1,16 @@
 var socNetName = undefined;
 var fb_link = "https://connect.facebook.net/ru_RU/sdk.js";
 var vk_link = "https://vk.com/js/api/openapi.js";
-
+var ok_link = "//api.ok.ru/js/fapi5.js";
 var baseScripts = [
     "http://www.bsmu.by/scripts/upper.js",
     fb_link,
     vk_link,
+    ok_link,
     "/comments/ajax_funcLib.js",
-    "/comments/ajax_control.js"
+    "/comments/ajax_control.js",
+    "/comments/googleAuth.js",
+    "/comments/odnoklassnikiAuth.js"
 ];
 
 //Проверка статуса логина соцсетей
