@@ -114,6 +114,7 @@ function getComments( $page_adress ) {
 
 	return $commentArray;
 }
+
 //получение списка существующих пользователей
 function getUsers() {
 	$query = "SELECT * FROM users ORDER BY last_name";
@@ -127,6 +128,7 @@ function getUsers() {
 
 	return $usersArray;
 }
+
 //бан пользователя
 function banUser( $user_id, $ban_time ) {
 	if ( $ban_time ) {
@@ -155,6 +157,7 @@ function banUser( $user_id, $ban_time ) {
 	$res = mysql_query( $query ) or die( "<p>Невозможно забанить пользователя: "
 	                                     . mysql_error() . "</p>" );
 }
+
 //получение списка забаненых пользователей
 function getBannedUsers() {
 	$query
@@ -169,6 +172,7 @@ function getBannedUsers() {
 
 	return $usersArray;
 }
+
 //получение списка существующих статей
 function getArticles() {
 	$query = "SELECT * FROM news ORDER BY date;";
@@ -182,6 +186,7 @@ function getArticles() {
 
 	return $articles_array;
 }
+
 //удяление комментария
 function deleteComment( $comment_id ) {
 	$query = "UPDATE comments SET deleted=1 WHERE id='{$comment_id}';";
@@ -189,9 +194,10 @@ function deleteComment( $comment_id ) {
 	or die( "<p>Невозможно удалить комментарий: " . mysql_error()
 	        . "</p>" );
 }
+
 /*добавляем коммментарий на существующую страницу , для этого мы запихиваем в пост
 массив все данные о том кто и что анписал, после чего функция забирает данныне из пост массива и доабвляет в базу*/
-function addCommentFromPage($userName) {
+function addCommentFromPage( $userName ) {
 	if ( isset( $_POST['pageUrl'] ) ) {
 		$page_url = $_POST['pageUrl'];
 	} else {
@@ -218,6 +224,7 @@ function addCommentFromPage($userName) {
 		}
 	}
 }
+
 //получаем текущие существующие комментарии со страницы
 function getCommentsFromPage() {
 	if ( isset( $_POST['pageUrl'] ) ) {
@@ -238,7 +245,7 @@ function getCommentsFromPage() {
 					$networkPrefix = 'http://www.facebook.com/';
 					break;
 				case 'plus.google.com':
-					$networkPrefix='https://plus.google.com/u/0/';
+					$networkPrefix = 'https://plus.google.com/u/0/';
 					break;
 			}
 			$text = "<div class='comment'>" .
@@ -264,6 +271,7 @@ function getCommentsFromPage() {
 
 	return $html_text;
 }
+
 //получаем хэш пользователя по его айдишнику в соцсети
 function getHashForUser( $network_url ) {
 
@@ -275,6 +283,7 @@ function getHashForUser( $network_url ) {
 	$row = mysql_fetch_array( $res );//получение результата запроса из базы;
 	return $row['user_hash'];
 }
+
 ///функция получает готовый массив с данными из соц сетки, проверяет ест ли пользователь из массива
 //в базе, и если есть то обновляет о нем инфу, естли нет - то добавляет нового пользователя
 //и после чего устанавливает куку
@@ -290,17 +299,22 @@ function setUserCookie( $userName, $cookieName ) {
 	$life_time = time() + ( 60 * 60 * 24 * 7 );
 	setcookie( $cookieName, $str, $life_time, ACCESS_PATH,
 		ACCESS_DOMAIN );
-	deleteOtherCookie($cookieName, $str);
+	deleteOtherCookie( $cookieName, $str );
 }
+
 //функция удаляет все ненужные куки(в один момент времени может бытьу станвлена только одна кука)
-function deleteOtherCookie($cookieName, $str){
-	$life_time=-3600;
-	if(isset($_COOKIE['up_key_vk']) && $cookieName!='up_key_vk') setcookie( $cookieName, $str, $life_time, ACCESS_PATH,
-		ACCESS_DOMAIN );
-	if(isset($_COOKIE['up_key_fb']) && $cookieName!='up_key_fb') setcookie( $cookieName, $str, $life_time, ACCESS_PATH,
-		ACCESS_DOMAIN );
-	if(isset($_COOKIE['up_key_gp']) && $cookieName!='up_key_gp') setcookie( $cookieName, $str, $life_time, ACCESS_PATH,
-		ACCESS_DOMAIN );
+function deleteOtherCookie( $cookieName, $str ) {
+	$life_time      = - 3600;
+	$cookie_postfix = array( 'vk', 'fb, gp, ok' );
+	foreach ( $cookie_postfix as $postfix ) {
+		if ( isset( $_COOKIE[ 'up_key_' . $postfix ] )
+		     && $cookieName != 'up_key_' . $postfix
+		) {
+			setcookie( $cookieName, $str, $life_time, ACCESS_PATH,
+				ACCESS_DOMAIN );
+		}
+	}
+
 }
 
 ?>

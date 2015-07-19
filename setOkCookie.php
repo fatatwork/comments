@@ -1,49 +1,29 @@
 <?php
 require_once 'funcLib.php';
+require_once 'OkAuthClass.php';
 
-$app_id = "1146120960";
-$app_public = "CBAMGBFFEBABABABA";
-$app_secret = "02512D53BCA1B025A431A034";
-$fields = "FIRST_NAME,LAST_NAME,UID,PIC_1";
-$redirect_path = "/setOkCookie.php";
-if(isset($_GET['error'])){
+if ( ! empty( $_GET['error'] ) ) {
+	// Пришёл ответ с ошибкой. Например, юзер отменил авторизацию.
 	echo "null";
-}
-else{
-	if(isset($_GET['code'])){
-		$code = $_GET('code');
-		$tokenInfo = json_decode( file_get_contents( 'https://api.odnoklassniki.ru/oauth/token.do?code=' . $code . 
-			'&client_id=' . $app_key . 
-			'&client_secret=' . $app_secret . 
-			'&redirect_uri=' . $redirect_path .
-			'&grant_type=authorization_code'),
-		true);
-		if(isset($tokenInfo['error']){
-			echo "null";
-		}
-		else{
-			if(isset($tokenInfo['access_token']){
-				$access_token = $tokenInfo['access_token'];
-				//Создаем подпись
-				$signature = strtolower(md5('application_key=' . $app_public .
-				'fields='. $fields . 
-				'method=users.getCurrentUser'. $app_secret));
-				
-			//Получаем информацию о пользователе
-			$userInfoFromServer = json_decode( file_get_contents( 'http://api.ok.ru/fb.do?application_key=' . $app_public .
-			'&method=users.getCurrentUser'.
-			'&fields='. $fields . 
-			'&sig=' . $signature), true); 
-			$userInfo = array();
-			print_r($userInfoFromServer);
-			/*$userInfo['first_name'] = $userInfo['first_name'];
-			$userInfo['last_name']  = $userInfo['last_name'];
-			$userInfo['image']      = $userInfo['photo_50'];
-			$userInfo['network']    = "vk.com";
-			$userInfo['identity']   = $userInfo['uid'];*/
-			}
-		}
+} elseif ( empty( $_GET['code'] ) ) {
+	// Самый первый запрос
+	OAuthOK::goToAuth();
+} else {
+	// Пришёл ответ без ошибок после запроса авторизации
+	if ( ! OAuthOK::getToken( $_GET['code'] ) ) {
+		die( 'Error - no token by code' );
 	}
+	$user = OAuthOK::getUser();
+
+	$userInfo['first_name'] = $user->first_name;
+	$userInfo['last_name']  = $user->last_name;
+	$userInfo['identity'] = $user->uid;
+	$userInfo['network']  = 'ok.ru';
+	$userInfo['image'] = $user->pic_1;
+
+	if(sizeof($userInfo)>0) setUserCookie( $userInfo, 'up_key_ok' );
 }
+
+echo "<script type='text/javascript'>window.close();</script>";
 
 ?>

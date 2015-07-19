@@ -132,8 +132,15 @@ function fb_auth() {
 
 function ok_auth() {
     //FAPI.UI.showPermissions("[\"" + "EVENTS" + "\"]");
-    window.open("http://www.odnoklassniki.ru/oauth/authorize?client_id=" + okAppId + "&response_type=code&redirect_uri='/setOkCookie.php'")
-
+    window.open("http://www.odnoklassniki.ru/oauth/authorize?client_id=" + okAppId + "&scope=SET_STATUS&response_type=code&redirect_uri=http://comments.akson.by/setOkCookie.php")
+    var intervalHwnd = setInterval(
+        function(){
+            var status = getCookie("up_key_ok");
+            if(status != undefined){
+                clearInterval(intervalHwnd);
+                getLoginStatusForAll();
+            }
+        }, 500);
 }
 
 //Callback ok.ru - требование документации
@@ -200,7 +207,7 @@ function contentNotAuthView() {
         "<a id='fb_auth' onClick='fb_auth()'><img src='../design/fb_icon.png'></a>" +
         "<div id='customBtn' class='customGPlusSignIn'> <img src='../design/google_icon.png'>" +
         "</div>" +
-        "<a id='ok_auth' onClick='ok_auth()'><img src='../design/fb_icon.png'></a>";
+        "<a id='ok_auth' onClick='ok_auth()'><img src='../design/ok_icon.png'></a>";
     infoBlock.appendChild(logoutText);
     authorized = false;
 }

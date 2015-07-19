@@ -5,22 +5,19 @@ require_once 'app_config.php';
 
 function loginUser() {
 	$life_time = time() + ( 60 * 60 * 24 * 7 );
-	if ( isset( $_COOKIE['up_key_vk'] ) ) {
-		$networkPrefix = 'vk';
+	global $cookieArray;
+	$cookie = null;
+	foreach ( $cookieArray as $c ) {
+		if ( $_COOKIE[ $c ] ) {
+			$cookie = $c;
+		}
 	}
-	if ( isset( $_COOKIE['up_key_fb'] ) ) {
-		$networkPrefix = 'fb';
-	}
-	if ( isset( $_COOKIE['up_key_gp'] ) ) {
-		$networkPrefix = 'gp';
-	}
-
-	$userInfo = getUserByHash( $_COOKIE[ 'up_key_' . $networkPrefix ] );
+	$userInfo = getUserByHash( $_COOKIE[ $cookie ] );
 	if ( $userInfo ) {
 		$userInfo['identity'] = $userInfo['network_url'];
 		addCommentFromPage( $userInfo );//добавляем коммент
 		//обновляем куку
-		setcookie( 'up_key_' . $networkPrefix, $userInfo['user_hash'],
+		setcookie( $cookie, $userInfo['user_hash'],
 			$life_time,
 			ACCESS_PATH,
 			ACCESS_DOMAIN );

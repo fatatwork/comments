@@ -18,10 +18,10 @@ $_SESSION['page_url'] = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'
 	<META http-equiv="X-UA-Compatible" content="IE=9">
 
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=windows-1251">
+	<meta name="google-signin-client_id" content="1060114582002-giddsvfq6rg7tdjhoqcp3p9d73672mvc.apps.googleusercontent.com">
 	<link
 		href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700&subset=cyrillic-ext"
 		rel="stylesheet" type="text/css">
-
 	<script type="text/javascript"
 	        src="http://www.bsmu.by/scripts/jquery.min.js"></script>
 	<script type="text/javascript"
