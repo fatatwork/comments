@@ -9,8 +9,7 @@ var baseScripts = [
     ok_link,
     "/comments/ajax_funcLib.js",
     "/comments/ajax_control.js",
-    "/comments/googleAuth.js",
-    "/comments/odnoklassnikiAuth.js"
+    "/comments/googleAuth.js"
 ];
 
 //Проверка статуса логина соцсетей

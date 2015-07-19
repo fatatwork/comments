@@ -29,9 +29,6 @@ function initiateSocApi(socID) {
         version: 'v2.3'
     });
 
-    var rParams = FAPI.Util.getRequestParameters();
-    FAPI.init(rParams["api_server"], rParams["apiconnection"]);
-
 }
 
 function getExistComments() {
@@ -122,7 +119,7 @@ function fb_auth() {
     FB.login(function(response) { //Popup
         FB.getLoginStatus(function(response) { //Проверяем статус логина
             if (response.status === 'connected') { //Если авторизовался
-                insertNewData(null, "../setFbCookie.php", null, "POST", function() {
+                insertNewData(null, "../setFbCookie.php", null, "POST", function(ret) {
                     getLoginStatusForAll();
                 });
             }
@@ -158,7 +155,8 @@ function logoutFunc() {
         //Выход из Google Plus
         GooglePlusLogOut();
         render();
-        document.location.href = document.location.href;
+        //document.location.href = document.location.href;
+        location.reload();
         //Изименение представления
         if (ret != undefined)
             if (ret == "logout")

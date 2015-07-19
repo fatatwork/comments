@@ -27,14 +27,25 @@ function loginFromFbSession() {
 	if ( $session ) {
 		// Logged in
 		try {
-			$request  = new FacebookRequest( $session, 'GET', '/me' );
+			$request  = new FacebookRequest( $session, 'GET', '/me', ['fields' => 'id,first_name,last_name'] );
 			$response = $request->execute();
 			$user
 			                        = $response->getGraphObject( Facebook\GraphUser::className() );
-			$username['first_name'] = $user->getFirstName();
-			$username['last_name']  = $user->getLastName();
+			$requestPic = new FacebookRequest(
+			  $session,
+			  'GET',
+			  '/me/picture',
+			  array (
+              'redirect' => false,
+              'type'     => 'square')
+			);
+			$responsePic = $requestPic->execute();
+			$picture = $responsePic->getGraphObject();
+			$username['first_name'] = $user->getProperty('first_name');
+			$username['last_name']  = $user->getProperty('last_name');
 			//$username['image'] инициализируется в яваскрипте
-			$username['identity'] = $user->getId();
+			$username['identity'] = $user->getProperty('id');
+			$username['image'] = $picture->getProperty('url');;
 			$username['network']  = 'facebook.com';
 
 			return $username;
