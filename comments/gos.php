@@ -179,17 +179,22 @@ $_SESSION['page_url'] = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'
 			     class="yashare-auto-init"></div>
 			<!-- Модуль комментариев -->
 			<div id="comments_module">
+				<a name="comm_btns"></a>
 				<div id="user_info"></div>
-					<form class="comments" action="#">
-						<div class="comment-send-area">
-							<div id="user_comment" onClick="delHolder()" role="textbox" contenteditable="true" data-role="editable" aria-multiline="true">
-							<p><span id="commentsPlaceHolder">Поделитесь своим мнением...</span></p></div>
-						</div>
-					</form>		
-				<a id="send_button"><span>Оставить сообщение</span></a>
-				
+				<form class="comments" action="#">
+					<div class="comment-send-area">
+						<div id="user_comment" onClick="delHolder()"
+						     role="textbox" contenteditable="true"
+						     data-role="editable" aria-multiline="true">
+							<p><span id="commentsPlaceHolder">Поделитесь своим мнением...</span>
+							</p></div>
+					</div>
+				</form>
+				<a id="send_button" onClick="sendBtnAction()"><span>Оставить сообщение</span></a>
+
 				<div id="comment-list"></div>
 			</div>
+			
 			<script charset="utf-8" src="http://yandex.st/share/share.js"
 			        type="text/javascript"></script>
 		</div>
