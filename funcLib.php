@@ -96,10 +96,9 @@ function addComment( $article_id, $user_id, $comment ) {//добавляем к�
 function getComments( $page_adress ) {
 	//INET_ATON-преобразует ip В число и INET_NTOA-число в ip
 	$newsID     = searchArticle( $page_adress );
-	$actualTime = time();
 	//Создаем запрос на слияние данных о пользователях с данными об их комментариях
 	$query
-		= "SELECT id, user_id, comment, add_time, first_name, last_name, image, network_url, network,ban_time, user_ip 
+		= "SELECT id, user_id, comment, DATE_FORMAT(add_time,'%H:%i %d.%m.%Y') add_time, first_name, last_name, image, network_url, network,ban_time, user_ip
 		FROM users NATURAL JOIN comments WHERE news_id='{$newsID}' AND deleted=false ORDER BY id;";
 	$result_obj = mysql_query( $query )
 	or die( "<p>Невозможно получить данные о комментариях: " . mysql_error()
@@ -256,9 +255,10 @@ function getCommentsFromPage() {
 			        . $comment['network_url'] . ">" .
 			        $comment['first_name'] . " " . $comment['last_name']
 			        . "</a> "
-			        . $comment['add_time'] . "</h4>" . $comment['comment']
-			        . "</span>" .
-			        "</div>";
+			        . $comment['add_time'] . "</h4><p>" . $comment['comment']
+			        . "</p></span>" .
+			        "</div>
+			        <div class='devinder'></div>";
 			array_push( $html_text, $text );
 		}
 	} else {
@@ -314,7 +314,6 @@ function deleteOtherCookie( $cookieName, $str ) {
 				ACCESS_DOMAIN );
 		}
 	}
-
 }
 
 ?>

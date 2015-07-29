@@ -77,6 +77,7 @@ function sendBtnAction() {
                     var params = 'currentComment=' + textOfComment + '&pageUrl=' + window.location + '&image=' + photoFb;
                     insertNewData(params, "../addComment.php", "comment-list", "POST", function(readyflag) {
                         if (readyflag) {
+                            textArea.innerText = "";
                             btnUnlock(btn);
                         } else {
                             textReplace(btn, "<span>Ошибка отправки</span>")
@@ -129,7 +130,7 @@ function fb_auth() {
 
 function ok_auth() {
     //FAPI.UI.showPermissions("[\"" + "EVENTS" + "\"]");
-    window.open("http://www.odnoklassniki.ru/oauth/authorize?client_id=" + okAppId + "&scope=SET_STATUS&response_type=code&redirect_uri=http://comments.akson.by/setOkCookie.php")
+    window.open("http://www.odnoklassniki.ru/oauth/authorize?client_id=" + okAppId + "&scope=SET_STATUS&response_type=code&redirect_uri=http://comments.akson.by/setOkCookie.php", "ok_auth", "'width=700,height=500")
     var intervalHwnd = setInterval(
         function(){
             var status = getCookie("up_key_ok");
@@ -188,10 +189,11 @@ function contentAuthView(userLink, first_name, last_name, photo) {
     deleteAllChilds(infoBlock);
     var authText = document.createElement("div");
     infoBlock.appendChild(authText);
-    authText.innerHTML = "<a href='" + userLink + "'>" + "<img id='avatar' src='" + photo + "'/></a><p>Вы вошли как: <a href='" +
+    authText.innerHTML = "<a href='" + userLink + "'>" + "<img id='avatar' src='" + photo + "'/></a><div>Вы вошли как: <a href='" +
         userLink + "'>" + first_name +
         " " + last_name +
-        "</a></p><p><a id='vk_logout' onClick='logoutFunc()' href='#'>Выйти</a></p>";
+        "</a></div></br><a id='logout_btn' onClick='logoutFunc()' href='#'><span>Выйти</span></a>" + 
+        "<div class='clearfix'></div>";
     authorized = true;
 }
 
@@ -199,14 +201,17 @@ function contentNotAuthView() {
     var infoBlock = document.getElementById("user_info");
     deleteAllChilds(infoBlock);
     var logoutText = document.createElement("div");
+    var clearFix = document.createElement("div");
     logoutText.id = "Login";
-    logoutText.innerHTML = "<p>Вы не авторизированы. Войдите через соц-сеть</p>" +
-        "<a id='vk_auth' onClick='vk_auth()'><img src='../design/vk_icon.png'></a>" +
-        "<a id='fb_auth' onClick='fb_auth()'><img src='../design/fb_icon.png'></a>" +
-        "<div id='customBtn' class='customGPlusSignIn'> <img src='../design/google_icon.png'>" +
+    clearFix.className = "clearfix";
+    logoutText.innerHTML = "<p>Вам необходимо войти.</p>" +
+        "<div id='vk_auth' class='btn' onClick='vk_auth()'><img src='../design/vk_icon.png'></div>" +
+        "<div id='fb_auth' class='btn' onClick='fb_auth()'><img src='../design/fb_icon.png'></div>" +
+        "<div id='customBtn' class='customGPlusSignIn btn'> <img src='../design/google_icon.png'>" +
         "</div>" +
-        "<a id='ok_auth' onClick='ok_auth()'><img src='../design/ok_icon.png'></a>";
+        "<div id='ok_auth' class='btn' onClick='ok_auth()'><img src='../design/ok_icon.png'></div>";
     infoBlock.appendChild(logoutText);
+    infoBlock.appendChild(clearFix);
     authorized = false;
 }
 

@@ -8,6 +8,5 @@ if(is_array($articles)){
 		"' onclick=\"insertNewData('article=".$article['id']."', 'admin_get_comments.php', 'list' ,'POST')\"/>".
 		$article['title']."</button><br />";
 	}
-	echo "</ul>";
 }
 ?>

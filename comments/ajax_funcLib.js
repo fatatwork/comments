@@ -64,27 +64,27 @@ function errorHandler(errorText) {
 	alert("Ошибка AJAX: " + errorText);
 }
 
-function adminGetExistArticles() {
-	insertNewData("", "admin_get_articles.php", "list", "POST");
+function adminGetExistArticles(url) {
+	insertNewData("", url, "list", "POST");
 }
 
-function banPressed(comment_id, user_id, param) {
+function banPressed(comment_id, user_id, param, action_script_url) {
 	var form = $("#form_" + comment_id);
 	var radios = $("#form_" + comment_id + " input[name=" + param + "]");
 	switch (param) {
 		case 'ban':
 			for (var i = 0; i != radios.lenght; ++i) {
 				if (radios[i].checked == true) {
-					insertNewData(param + '=' + radios[i].value + '&' + 'user_id=' + user_id, 'admin_get_comments.php', 'list', 'POST');
+					insertNewData(param + '=' + radios[i].value + '&' + 'user_id=' + user_id, action_script_url, 'list', 'POST');
 					break;
 				}
 			}
 			break;
 		case 'delete':
-			insertNewData(param + '=' + comment_id, 'admin_get_comments.php', 'list', 'POST');
+			insertNewData(param + '=' + comment_id, action_script_url, 'list', 'POST');
 			break;
 		case 'unban_user':
-			insertNewData(param + '=' + user_id, 'admin_get_comments.php', 'list', 'POST');
+			insertNewData(param + '=' + user_id,action_script_url, 'list', 'POST');
 			break;
 	}
 }
