@@ -59,7 +59,10 @@ function sendBtnAction() {
             /*Извлекаем текст комментария из текстового поля*/
             var textArea = document.getElementById("user_comment");
             var placeholder = document.getElementById("commentsPlaceHolder");
+            
             var textOfComment = textArea.innerText;
+            if(textOfComment == undefined) textOfComment=textArea.textContent;
+
             if (placeholder != undefined) {
                 var holderText = placeholder.innerText;
                 //Поиск текста из плейсхолдера - не считается комментарием
