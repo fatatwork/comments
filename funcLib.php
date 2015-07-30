@@ -246,6 +246,9 @@ function getCommentsFromPage() {
 				case 'plus.google.com':
 					$networkPrefix = 'https://plus.google.com/u/0/';
 					break;
+				case 'ok.ru':
+					$networkPrefix = 'https://ok.ru/profile/';
+					break;
 			}
 			$text = "<div class='comment'>" .
 			        /*вывод аватарки
