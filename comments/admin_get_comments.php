@@ -22,41 +22,57 @@ if ( $_REQUEST ) {
 		$_SESSION['article'] = $_REQUEST['article'];
 		$article             = searchArticleById( $_REQUEST['article'] );
 		$comments            = getComments( $article['link'] );
+		echo "<button class='green_btn' type='submit' name='back' 
+									onclick=\"location.href=location.href\" /><i class='fa fa-arrow-circle-o-left fa-lg'></i> Назад к списку статей</button>";
+									echo "<br /><u><h3><span>Комментарии к статье:</span></h3></u>";
 		if ( sizeof( $comments ) != null) {
 			$comments = array_reverse( $comments, true );
 			foreach ( $comments as $comment ) {
-				echo $comment['first_name'] . " " . $comment['last_name'] . " "
-				     . $comment['add_time'] . "<br />" .
-				     $comment['comment'];
+				echo "<div class='comment'>";
+				echo "<h3>".$comment['first_name'] . " " . $comment['last_name'] . "</h3> - <i class='fa fa-clock-o'></i> "
+				     . $comment['add_time'] . "<br /><p>" .
+				     $comment['comment'] . "</p>";
+				echo "<div class='clearfix'></div>";
 				if ( ! $comment['ban_time'] ) {
 					echo "<div class='ban_form' id='form_" . $comment['id'] . "'>
-								<div class='ban_buttons'>
-									<input type='radio'  name='ban' value='day'/>День
-									<input type='radio'  name='ban' value='week'/>Неделя
-									<input type='radio'  name='ban' value='month'/>Месяц
-									<input type='radio'  name='ban' value='year'/>Год
-									<input type='radio'  name='ban' value='forever'/>Навсегда<br />
-									<button type='submit' name='user_id' 
+					<div class='gray_btn'>
+					<ul class='ban_buttons'>
+						<h3><i class='fa fa-user-times fa-lg'></i> Блокировка пользователя</h3><br />
+									<li><input type='radio'  name='ban' value='day'/>День</li>
+									<li><input type='radio'  name='ban' value='week'/>Неделя</li>
+									<li><input type='radio'  name='ban' value='month'/>Месяц</li>
+									<li><input type='radio'  name='ban' value='year'/>Год</li>
+									<li><input type='radio'  name='ban' value='forever'/>Навсегда</li>
+									<br />
+									<button class='ban_btn' type='submit' name='user_id' 
 									onclick=\"banPressed('" . $comment['id']
-					     . "','" . $comment['user_id'] . "','ban', 'admin_get_comments.php')\" />забанить</button>
-									<button type='submit' name='comment_id'
+					     . "','" . $comment['user_id'] . "','ban', 'admin_get_comments.php')\" /><i class='fa fa-legal fa-lg'></i> Забанить пользователя</button>
+									</ul>
+						</div>
+									<button class='delete_btn' type='submit' name='comment_id'
 									onclick=\"banPressed('" . $comment['id']
-					     . "','" . $comment['user_id'] . "','delete', 'admin_get_comments.php')\" />удалить</button>
-								</div>
-				 			 </div>";
+					     . "','" . $comment['user_id'] . "','delete', 'admin_get_comments.php')\" /><i class='fa fa-times-circle-o fa-lg'></i> Удалить комментарий</button>
+								
+							</div><div class='clearfix'></div>
+							</div>";
 				} else {
 					echo
-						"<div class='ban_form' id='form_" . $comment['id'] . "'>
-							   Бан истекает" . date( "H:m d.m.Y",
+						"<div class='comment'><div class='ban_form' id='form_" . $comment['id'] . "'>
+							   Бан истекает " . date( "d.m.Y в H:m",
 							$comment['ban_time'] ) ."</br>".
-						"<button type='submit' name='unban_user' onclick=\"banPressed('"
-						. $comment['id'] . "','" . $comment['user_id'] . "','unban_user', 'admin_get_comments.php')\"/>разбанить</button>
-						</div>";
+						"<button class='green_btn' type='submit' name='unban_user' onclick=\"banPressed('"
+						. $comment['id'] . "','" . $comment['user_id'] . "','unban_user', 'admin_get_comments.php')\"/><i class='fa fa-legal fa-lg'></i> Разбанить пользователя</button>
+							<button class='delete_btn' type='submit' name='comment_id'
+									onclick=\"banPressed('" . $comment['id']
+					     . "','" . $comment['user_id'] . "','delete', 'admin_get_comments.php')\" /><i class='fa fa-times-circle-o fa-lg'></i> Удалить комментарий</button>
+								</div><div class='clearfix'></div>
+						</div></div>";
 				}
-				echo "<br />";
+				echo "<div class='devinder'></div>
+				<br />";
 			}
 		} else {
-			echo "Пока нет комментариев";
+			echo "<div>Пока нет комментариев</div>";
 		}
 	}
 }

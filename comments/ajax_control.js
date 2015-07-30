@@ -52,6 +52,10 @@ function getLoginStatusForAll() {
 }
 
 function sendBtnAction() {
+    hasOpera = !!window.opera;
+    hasChrome = !!window.chrome;
+    hasFireFox = !!window.sidebar;
+
     var btn = document.getElementById("send_button");
     if (authorized == true) {
         if (sendBtnLocked != true) {
@@ -59,7 +63,12 @@ function sendBtnAction() {
             /*Извлекаем текст комментария из текстового поля*/
             var textArea = document.getElementById("user_comment");
             var placeholder = document.getElementById("commentsPlaceHolder");
-            var textOfComment = textArea.innerText;
+
+            var textOfComment;
+            if(hasFireFox) textOfComment=textArea.textContent;
+            if(hasChrome) textOfComment=textArea.innerText;
+
+
             if (placeholder != undefined) {
                 var holderText = placeholder.innerText;
                 //Поиск текста из плейсхолдера - не считается комментарием
@@ -148,7 +157,10 @@ function ok_auth() {
 
 //Слушаем кнопку, ждем нажатия
 function logoutFunc() {
-    event.preventDefault();
+    hasOpera = !!window.opera;
+    hasChrome = !!window.chrome;
+    hasFireFox = !!window.sidebar;
+
     loadingInsert();
     insertNewData(null, "../logout.php", null, "POST", function(ret) {
         //Выход из фейсбука
@@ -156,13 +168,16 @@ function logoutFunc() {
         //Выход из Google Plus
         GooglePlusLogOut();
         render();
-        //document.location.href = document.location.href;
+        //document.location
+        // .href = document.location.href;
         location.reload();
         //Изименение представления
         if (ret != undefined)
             if (ret == "logout")
                 contentNotAuthView();
     });
+    if(hasFireFox==true)  setTimeout(alert('Выход...') , 5000);
+    else event.preventDefault();
 }
 
 
@@ -192,7 +207,7 @@ function contentAuthView(userLink, first_name, last_name, photo) {
     authText.innerHTML = "<a href='" + userLink + "'>" + "<img id='avatar' src='" + photo + "'/></a><div>Вы вошли как: <a href='" +
         userLink + "'>" + first_name +
         " " + last_name +
-        "</a></div></br><a id='logout_btn' onClick='logoutFunc()' href='#'><span>Выйти</span></a>" + 
+        "</a></div></br><a id='logout_btn' onClick='logoutFunc()' href='#'><span>Выйти</span></a>" +
         "<div class='clearfix'></div>";
     authorized = true;
 }
