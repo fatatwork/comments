@@ -1,0 +1,31 @@
+<?php
+require_once 'funcLib.php';
+require_once 'funcLib.php';
+session_start();
+header( 'Content-type: text/html; charset=utf-8' );
+$bannedUsers = getBannedUsers();
+
+if ( isset( $_REQUEST['unban_user'] ) ) {
+	banUser( $_REQUEST['unban_user'], null );
+}
+
+if ( sizeof( $bannedUsers ) == 0 ) {
+	echo "Нет забаненных пользователей";
+	return;
+}
+echo "<div class='devinder'></div><br />";
+foreach ( $bannedUsers as $_user ) {
+	echo "<div class='comment'>";
+	echo $_user['first_name'] . " " . $_user['last_name'] . " - id: "
+	     . $_user['user_id'] . "</br>";
+	if ( $_user['ban_time'] != 0 ) {
+		echo "Бан истекает: " . date( "d.m.Y в H:m", $_user['ban_time'] );
+		echo
+		"<div class='clearfix'></div><button class='green_btn' type='submit' name='unban_user' onclick=\"banPressed('null','"
+			. $_user['user_id']
+			. "','unban_user', '../admin_get_banned_users.php')\"/><i class='fa fa-legal fa-lg'></i> Разбанить пользователя</button></br>";
+		echo "</div><div class='devinder'></div><br />";
+	}
+}
+
+?>
