@@ -13,7 +13,7 @@ function loginUser() {
 		}
 	}
 	$userInfo = getUserByHash( $_COOKIE[ $cookie ] );
-	if ( $userInfo ) {
+	if ( $userInfo['ban_time']==0 ) {
 		$userInfo['identity'] = $userInfo['network_url'];
 		addCommentFromPage( $userInfo );//добавляем коммент
 		//обновляем куку
@@ -21,6 +21,8 @@ function loginUser() {
 			$life_time,
 			ACCESS_PATH,
 			ACCESS_DOMAIN );
+	} else {
+		echo "<p><h1><span style='color:red'>Вы забанены!</h1></span></p>";
 	}
 }
 

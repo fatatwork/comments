@@ -46,7 +46,7 @@ function searchUserById( $user_id ) {
 
 function getUserByHash( $hash ) {
 	$query
-		= "SELECT first_name, last_name, image, network_url, user_hash FROM users WHERE user_hash = '{$hash}'";//ищем есть ли такой же url в базе
+		= "SELECT first_name, last_name, image, network_url, user_hash, ban_time FROM users WHERE user_hash = '{$hash}'";//ищем есть ли такой же url в базе
 	$res = mysql_query( $query )
 	or die( "<p>Невозможно сделать запрос поиска пользователя: " . mysql_error()
 	        . "</p>" );
@@ -160,7 +160,7 @@ function banUser( $user_id, $ban_time ) {
 //получение списка забаненых пользователей
 function getBannedUsers() {
 	$query
-		= "SELECT user_id  FROM users WHERE ban_time!=0;";
+		= "SELECT *  FROM users WHERE ban_time!=0;";
 	$result = mysql_query( $query )
 	or die( "<p>Невозможно получить данные о пользователях: " . mysql_error()
 	        . "</p>" );

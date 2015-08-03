@@ -1,27 +1,17 @@
-<?php
-session_start();
-header( 'Content-type: text/html; charset=utf-8' );
-require_once '../funcLib.php';
-
-//адрес странички с которой перенаправляемься на авторизацию
-$_SESSION['page_url'] = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-?>
 <!DOCTYPE html>
+<meta charset="UTF8">
 <HTML xmlns="http://www.w3.org/1999/xhtml">
 <HEAD>
 	<TITLE>Комплексный государственный экзамен</TITLE>
-	<META NAME="DESCRIPTION"
-	      CONTENT="Белорусский государственный медицинский университет - ведущее высшее медицинское учебное учреждение Республики Беларусь, имеющее заслуженный международный авторитет и признание. На кафедрах университета обучаются 7046 студентов, 68 аспирантов и 286 клинических ординаторов, в том числе 808 иностранных студентов и 74 иностранных клинических ординатора.">
-	<META NAME="KEYWORDS"
-	      CONTENT="Общеуниверситетские, БГМУ, белорусский государственный медицинский университет, университет, вуз, минск, образование, высшее образование, цт, централизованное тестирование, абитуриент, студент, наука, аспирантура, медицинский, врач">
-	<META NAME="ROBOTS" CONTENT="all">
-	<META http-equiv="X-UA-Compatible" content="IE=9">
+	<meta name="DESCRIPTION"
+	      content="Белорусский государственный медицинский университет - ведущее высшее медицинское учебное учреждение Республики Беларусь, имеющее заслуженный международный авторитет и признание. На кафедрах университета обучаются 7046 студентов, 68 аспирантов и 286 клинических ординаторов, в том числе 808 иностранных студентов и 74 иностранных клинических ординатора.">
+	<meta name="KEYWORDS"
+	      content="Общеуниверситетские, БГМУ, белорусский государственный медицинский университет, университет, вуз, минск, образование, высшее образование, цт, централизованное тестирование, абитуриент, студент, наука, аспирантура, медицинский, врач">
+	<meta name="ROBOTS" content="all">
+	<meta http-equiv="X-UA-Compatible" content="IE=9">
 
-	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=windows-1251">
+	<meta http-equiv="Content-Type" content="text/html; CHARSET=windows-1251">
 	<meta name="google-signin-client_id" content="1060114582002-giddsvfq6rg7tdjhoqcp3p9d73672mvc.apps.googleusercontent.com">
-	<link
-		href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700&subset=cyrillic-ext"
-		rel="stylesheet" type="text/css">
 	<script type="text/javascript"
 	        src="http://www.bsmu.by/scripts/jquery.min.js"></script>
 	<script type="text/javascript"
@@ -179,9 +169,11 @@ $_SESSION['page_url'] = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'
 			     class="yashare-auto-init"></div>
 			<!-- Модуль комментариев -->
 			<div id="comments_module">
+				<h2>Комментарии</h2>
 				<a name="comm_btns"></a>
 				<div id="user_info"></div>
 				<form class="comments" action="#">
+					<div class="clearfix"></div>
 					<div class="comment-send-area">
 						<div id="user_comment" onClick="delHolder()"
 						     role="textbox" contenteditable="true"
@@ -190,8 +182,7 @@ $_SESSION['page_url'] = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'
 							</p></div>
 					</div>
 				</form>
-				<a id="send_button" onClick="sendBtnAction()"><span>Оставить сообщение</span></a>
-
+				<a id="send_button" onClick="sendBtnAction()"><span>Отправить сообщение</span></a>
 				<div id="comment-list"></div>
 			</div>
 			

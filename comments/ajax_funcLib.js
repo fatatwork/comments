@@ -64,10 +64,6 @@ function errorHandler(errorText) {
 	alert("Ошибка AJAX: " + errorText);
 }
 
-function adminGetExistArticles(url) {
-	insertNewData("", url, "list", "POST");
-}
-
 function banPressed(comment_id, user_id, param, action_script_url) {
 	var form = $("#form_" + comment_id);
 	var radios = $("#form_" + comment_id + " input[name=" + param + "]");
