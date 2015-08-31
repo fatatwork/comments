@@ -162,7 +162,7 @@ function getBannedUsers() {
 	$query
 		= "SELECT *  FROM users WHERE ban_time!=0;";
 	$result = mysql_query( $query )
-	or die( "<p>Невозможно получить данные о пользователях: " . mysql_error()
+	or die( "<p>Невозможно получить данные о заблокированных пользователях: " . mysql_error()
 	        . "</p>" );
 	$usersArray = array();
 	while ( $row = mysql_fetch_array( $result ) ) {
@@ -193,7 +193,15 @@ function deleteComment( $comment_id ) {
 	or die( "<p>Невозможно удалить комментарий: " . mysql_error()
 	        . "</p>" );
 }
+//проверка данных на корректность
+function CompareString($comment){
+	$comment=trim($comment);
+	$comment = strip_tags($comment);
+	$comment=htmlspecialchars($comment);
+	$comment= mysql_real_escape_string($comment);
 
+	if($comment) return $comment;
+}
 /*добавляем коммментарий на существующую страницу , для этого мы запихиваем в пост
 массив все данные о том кто и что анписал, после чего функция забирает данныне из пост массива и доабвляет в базу*/
 function addCommentFromPage( $userName ) {
@@ -204,9 +212,9 @@ function addCommentFromPage( $userName ) {
 	}
 
 	if ( isset( $_POST['currentComment'] ) ) {
-		$comment = trim( $_POST['currentComment'] );
+		$comment=CompareString( $_POST['currentComment']);
 		$user_ip = $_SERVER["REMOTE_ADDR"];
-		if ( isset( $userName ) ) {
+		if ( isset( $userName ) && $comment) {
 			$article_id
 				= searchArticle( $page_url ); //Получаем идентификатор страницы на которой нужно разместить комментарий
 			$user_id
