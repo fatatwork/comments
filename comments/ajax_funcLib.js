@@ -71,7 +71,10 @@ function banPressed(comment_id, user_id, param, action_script_url) {
 		case 'ban':
 			for (var i = 0; i != radios.lenght; ++i) {
 				if (radios[i].checked == true) {
-					insertNewData(param + '=' + radios[i].value + '&' + 'user_id=' + user_id, action_script_url, 'list', 'POST');
+					insertNewData(param + '=' + radios[i].value + '&' + 'user_id=' + user_id + '&' + 'comment_id='+comment_id,
+                        action_script_url,
+                        'list',
+                        'POST');
 					break;
 				}
 			}

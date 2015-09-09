@@ -22,7 +22,8 @@ function loginUser() {
 			ACCESS_PATH,
 			ACCESS_DOMAIN );
 	} else {
-		echo "<p><h1><span style='color:red'>Вы забанены!</h1></span></p>";
+		$ban_time= date("H:i  d.m.Y" , $userInfo["ban_time"]);
+		echo "<p><h1><span style='color:red'>Вы забанены до $ban_time</h1></span></p>";
 	}
 }
 

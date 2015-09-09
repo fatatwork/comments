@@ -54,23 +54,22 @@ function getUserByHash( $hash ) {
 	return $row;
 }
 
-function addUser( $userName, $user_ip ) {//добавление пользователя
+function addUser( $userName) {//добавление пользователя
 	if ( isset( $userName['first_name'], $userName['last_name'], $userName['identity'] ) ) {
 		$hash_str = sha1( HASH_PREFIX . $userName['identity'] );
 		$query
 		          = "INSERT INTO users (first_name, last_name, image, network, network_url,user_hash, user_ip)
 			VALUES ('{$userName['first_name']}', '{$userName['last_name']}','{$userName['image']}', 
-				'{$userName['network']}', '{$userName['identity']}', '{$hash_str}', INET_ATON('{$user_ip}' ));";
+				'{$userName['network']}', '{$userName['identity']}', '{$hash_str}');";
 		$result = mysql_query( $query )
 		or die( "<p>Невозможно добавить пользователя " . mysql_error()
 		        . "</p>" );
 	}
 }
 
-function updateUser( $userName, $user_id, $user_ip ) {
+function updateUser( $userName, $user_id ) {
 	$query
-		    = "UPDATE users SET first_name='{$userName['first_name']}',last_name='{$userName['last_name']}', image='{$userName['image']}',
-		user_ip=INET_ATON('{$user_ip}') WHERE user_id='{$user_id}';";
+		    = "UPDATE users SET first_name='{$userName['first_name']}',last_name='{$userName['last_name']}', image='{$userName['image']}' WHERE user_id='{$user_id}';";
 	$result = mysql_query( $query );
 }
 
@@ -78,11 +77,12 @@ function addComment( $article_id, $user_id, $comment ) {//добавляем к�
 	$query    = "SELECT ban_time FROM users WHERE user_id='{$user_id}';";
 	$res      = mysql_query( $query );
 	$ban_time = mysql_fetch_row( $res );
+	$ip = $_SERVER["REMOTE_ADDR"];
 	if ( $ban_time[0] != 0 ) {
 		return false;
 	}
-	$query = "INSERT INTO comments (news_id, user_id, comment, add_time)
-	          VALUES ('{$article_id}', '{$user_id}', '{$comment}', NOW());";
+	$query = "INSERT INTO comments (news_id, user_id, comment, add_time, ip)
+	          VALUES ('{$article_id}', '{$user_id}', '{$comment}', NOW(), '{$ip}');";
 	$res = mysql_query( $query )
 	or die( "<p>Невозможно сделать запись комментария: " . mysql_error()
 	        . "</p>" );
@@ -127,7 +127,12 @@ function getUsers() {
 
 	return $usersArray;
 }
-
+function addBannedComment($comment_id){
+	$query = "UPDATE comments SET banned=1 WHERE id='{$comment_id}';";
+	$result = mysql_query( $query )
+	or die( "<p>Невозможно установить флаг бана для комментария " . mysql_error()
+	        . "</p>" );
+}
 //бан пользователя
 function banUser( $user_id, $ban_time ) {
 	if ( $ban_time ) {
@@ -213,16 +218,15 @@ function addCommentFromPage( $userName ) {
 
 	if ( isset( $_POST['currentComment'] ) ) {
 		$comment=CompareString( $_POST['currentComment']);
-		$user_ip = $_SERVER["REMOTE_ADDR"];
 		if ( isset( $userName ) && $comment) {
 			$article_id
 				= searchArticle( $page_url ); //Получаем идентификатор страницы на которой нужно разместить комментарий
 			$user_id
 				= searchUser( $userName['identity'] );//первоначально ищем пользователя
 			if ( $user_id ) {//Пишем коммент
-				updateUser( $userName, $user_id, $user_ip );
+				updateUser( $userName, $user_id);
 			} else {//если юзера нет- добавляем и пишем коммент
-				addUser( $userName, $user_ip );
+				addUser( $userName);
 				$user_id = searchUser( $userName['identity'] );
 			}
 			if ( $comment != "" ) {

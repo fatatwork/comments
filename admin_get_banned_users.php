@@ -19,7 +19,7 @@ foreach ( $bannedUsers as $_user ) {
 	echo $_user['first_name'] . " " . $_user['last_name'] . " - id: "
 	     . $_user['user_id'] . "</br>";
 	if ( $_user['ban_time'] != 0 ) {
-		echo "Бан истекает: " . date( "d.m.Y в H:m", $_user['ban_time'] );
+		echo "Бан истекает: " . date( "H:i d.m.Y", $_user['ban_time'] );
 		echo
 		"<div class='clearfix'></div><button class='green_btn' type='submit' name='unban_user' onclick=\"banPressed('null','"
 			. $_user['user_id']

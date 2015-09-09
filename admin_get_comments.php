@@ -10,6 +10,7 @@ if ( $_REQUEST ) {
 
 	if ( isset( $_REQUEST['user_id'] ) && isset( $_REQUEST['ban'] ) ) {
 		banUser( $_REQUEST['user_id'], $_REQUEST['ban'] );
+		addBannedComment($_REQUEST['comment_id']);
 	}
 	if ( isset( $_REQUEST['unban_user'] ) ) {
 		banUser( $_REQUEST['unban_user'], null );
