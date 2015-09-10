@@ -93,6 +93,7 @@ function addComment( $article_id, $user_id, $comment ) {//добавляем к�
 	}
 }
 
+///Функция выхвода комментариев на страничку, вместо page_adress можно вставить айдишник новости, немного изменив запрос к базе
 function getComments( $page_adress ) {
 	//INET_ATON-преобразует ip В число и INET_NTOA-число в ip
 	$newsID     = searchArticle( $page_adress );
@@ -176,7 +177,17 @@ function getBannedUsers() {
 
 	return $usersArray;
 }
-
+function getLastBannedCommentForUser($user_id){
+	$query = "SELECT * FROM comments WHERE user_id='{$user_id}' AND banned=1;";
+	$res=mysql_query($query)
+	or die( "<p>Невозможно получить массив забаненных комментариев: " . mysql_error()
+	        . "</p>" );
+	$bannedComments = array();
+	while ( $row = mysql_fetch_array( $res ) ) {
+		array_push( $bannedComments, $row );
+	}
+	return $bannedComments[sizeof($bannedComments)-1];
+}
 //получение списка существующих статей
 function getArticles() {
 	$query = "SELECT * FROM news ORDER BY date;";
