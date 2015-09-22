@@ -4,10 +4,10 @@ session_start();
 header( 'Content-type: text/html; charset=utf-8' );
 $articles = getArticles();
 if ( $_REQUEST ) {
+
 	if ( ! isset( $_REQUEST['article'] ) && isset( $_SESSION['article'] ) ) {
 		$_REQUEST['article'] = $_SESSION['article'];
 	}
-
 	if ( isset( $_REQUEST['user_id'] ) && isset( $_REQUEST['ban'] ) ) {
 		banUser( $_REQUEST['user_id'], $_REQUEST['ban'] );
 		addBannedComment($_REQUEST['comment_id']);
@@ -29,10 +29,15 @@ if ( $_REQUEST ) {
 		if ( sizeof( $comments ) != null) {
 			$comments = array_reverse( $comments, true );
 			foreach ( $comments as $comment ) {
-				echo "<div class='comment'>";
+				//Начало вывода комментария
+				echo "<div class='comment'>" .
+				"<div class='mainInfo'>";
 				echo "<h3>".$comment['first_name'] . " " . $comment['last_name'] . "</h3> - <i class='fa fa-clock-o'></i> "
 				     . $comment['add_time'] . "<br /><p>" .
-				     $comment['comment'] . "</p>";
+				     $comment['comment'] . "</p></div>";
+				echo "<div class='additionalInfo'>";
+				echo "<div class='articleTitle'>Перейти к новости: " .
+				"<a href='" . $article['link'] . "' target='_blank'>" . $article['title'] . "</a></div>";
 				echo "<div class='clearfix'></div>";
 				if ( ! $comment['ban_time'] ) {
 					echo "<div class='ban_form' id='form_" . $comment['id'] . "'>
@@ -70,8 +75,7 @@ if ( $_REQUEST ) {
 								</div><div class='clearfix'></div>
 						</div></div>";
 				}
-				echo "<div class='devinder'></div>
-				<br />";
+				echo "<div class='devinder'></div></div>";
 			}
 		} else {
 			echo "<div>Пока нет комментариев</div>";
